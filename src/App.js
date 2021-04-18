@@ -3,7 +3,7 @@ import './App.css';
 import React from 'react'
 //import Editor from "./components/Editor";
 import Editor, { useMonaco } from "@monaco-editor/react";
-
+import Terminal from "./components/Terminal"
 import { listen } from 'vscode-ws-jsonrpc';
 
 import
@@ -110,6 +110,7 @@ function App()
         theme="vs-dark"
       />
 
+    <Terminal/>
     </div>
   );
 }
