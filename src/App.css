@@ -1,0 +1,71 @@
+.header {
+  text-align: center;
+}
+
+ul {
+  list-style-type: none;
+}
+
+ul li {
+  cursor: pointer;
+  position: relative;
+  padding: 12px 8px 10px 0px;
+  background: #eee;
+  font-size: 16px;
+  transition: 0.2s;
+}
+
+ul li:hover {
+  background: #ddd;
+}
+
+.Remove {
+  border-radius: 5px;
+  color: #fff;
+  background-color: rgb(121, 121, 121);
+}
+
+.Remove:hover {
+  background-color: rgb(107, 106, 106);
+}
+
+.Delete_Btn {
+  margin-left: 35px;
+  border-radius: 5px;
+  color: #fff;
+  background-color: rgb(143, 143, 143);
+}
+
+.Delete_Btn:hover {
+  background-color: rgb(107, 106, 106);
+}
+
+textarea {
+  resize: none;
+  box-shadow: 0px 0px 3px 3px rgb(211, 209, 209);
+}
+
+textarea:focus {
+  outline: none !important;
+}
+
+.comment-card {
+  margin-bottom: 10px;
+  padding: 5px 5px 5px 10px;
+  box-shadow: 3px 2.5px 2.5px rgba(100, 100, 100, 0.5);
+}
+
+.comment-card-body {
+  padding: 15px;
+}
+
+.comment-user-name {
+  margin-left: 15px;
+  font-size: 22px;
+}
+
+.comment-text {
+  font-size: 20px;
+  text-align: start;
+  margin-left: 20px;
+}
