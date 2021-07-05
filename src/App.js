@@ -13,6 +13,7 @@ import { BsInbox, BsPlusSquare, BsArrowBarRight } from "react-icons/bs";
 import { MdHome, MdNotifications, MdPeople, MdHelp, MdFolder, MdCode } from "react-icons/md"
 import { SiJavascript, SiPython, SiCplusplus, SiPhp, SiNodeDotJs, SiJava } from "react-icons/si"
 import Sidebar from "react-sidebar";
+import CommunicationPage from "./Communication/Communication" 
 import TrelloPage from './components/TrelloPage'
 import Ide from "./Project_Page/projectPage";
 
@@ -333,6 +334,14 @@ function IDE() {
   );
 }
 
+function Communication() {
+  return (
+    <div /*style={{ paddingTop: 60 }}*/>
+      <CommunicationPage />
+    </div>
+  );
+}
+
 function Tasks() {
   return (
     <div style={{ paddingTop: 60 }}>
@@ -607,6 +616,7 @@ class Default extends React.Component {
           <Route path="/default/projects" component={Projects} />
           <Route path="/default/create-project" component={CreateProject} />
           <Route path="/default/ide" component={IDE} />
+          <Route path="/default/communication" component={Communication} />
           <Route path="/default/tasks" component={Tasks} />
         </Switch>
         {/*</Sidebar>*/}

@@ -1,0 +1,28 @@
+.message {
+    display: flex;
+    flex-direction: row;
+    padding: 1%;
+  }
+
+  .message:hover { 
+      background-color: #ccc;
+      cursor: default;
+  }
+
+  .messageinfo {
+      display: flex;
+      flex-direction: column;
+      height: 100%;
+      margin-left: 9px;
+  }
+
+  .avatar { 
+      margin-top: 0.5%;
+  }
+
+  .user { 
+    font-size: medium;
+    font-weight: 600;
+  }
+  
+  

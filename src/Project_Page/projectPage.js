@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import Editor from "@monaco-editor/react";
+import Editor, { DiffEditor, useMonaco, loader } from "@monaco-editor/react";
 import Terminal from "react-console-emulator";
 import ReactTooltip from "react-tooltip";
 import { Drawer } from '@material-ui/core';
@@ -12,7 +12,14 @@ import { Collapse } from 'reactstrap';
 import { Link } from "react-router-dom";
 import "./projectPage.css";
 
+import { listen } from 'vscode-ws-jsonrpc';
 
+import {
+  MonacoLanguageClient, MessageConnection, CloseAction, ErrorAction,
+  MonacoServices, createConnection
+} from 'monaco-languageclient';
+
+import ReconnectingWebSocket from 'reconnecting-websocket';
 
 const drawerWidth = 180;
 
@@ -36,6 +43,81 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 function Ide(props) {
+
+  const monaco = useMonaco();
+  React.useEffect(() => {
+    if (monaco) {
+
+      monaco.languages.register({
+        id: 'python',
+        extensions: ['.py'],
+        aliases: ['python'],
+        mimetypes: ['application/text']
+      }, {
+        id: 'cpp',
+        extensions: ['.cpp'],
+        aliases: ['cpp'],
+        mimetypes: ['application/text']
+      })
+
+      
+
+
+      MonacoServices.install(monaco);
+
+      const url = 'ws://localhost:3002/python'
+      const webSocket = createWebSocket(url);
+
+      listen({
+        webSocket,
+        onConnection: connection => {
+          // create and start the language client
+          const languageClient = createLanguageClient(connection);
+          const disposable = languageClient.start();
+          connection.onClose(() => disposable.dispose());
+        }
+      });
+
+
+      function createLanguageClient(connection) {
+        return new MonacoLanguageClient({
+          name: "Sample Language Client",
+          clientOptions: {
+            // use a language id as a document selector
+            documentSelector: ['python', 'cpp'],
+            // disable the default error handler
+            errorHandler: {
+              error: () => ErrorAction.Continue,
+              closed: () => CloseAction.DoNotRestart
+            }
+          },
+          // create a language client connection from the JSON RPC connection on demand
+          connectionProvider: {
+            get: (errorHandler, closeHandler) => {
+              return Promise.resolve(createConnection(connection, errorHandler, closeHandler))
+            }
+          }
+        });
+      }
+
+
+      function createWebSocket(url) {
+        const socketOptions = {
+          maxReconnectionDelay: 10000,
+          minReconnectionDelay: 1000,
+          reconnectionDelayGrowFactor: 1.3,
+          connectionTimeout: 10000,
+          maxRetries: Infinity,
+          debug: false
+        };
+        return new ReconnectingWebSocket(url, [], socketOptions);
+      }
+
+
+
+      console.log("here is the monaco isntance:", monaco.languages);
+    }
+  }, [monaco]);
 
   const classes = useStyles();
   const theme = useTheme();
@@ -73,7 +155,7 @@ function Ide(props) {
   };
 
   const options = {
-    language: "javascript",
+    language: "python",
     automaticLayout: true,
     selectOnLineNumbers: true,
     renderIndentGuides: true,
@@ -88,6 +170,8 @@ function Ide(props) {
 
   const errorText = "Please enter appropriate command, type help to know more.";
 
+  
+
 
   return (
     <div className="flex-row">
@@ -97,8 +181,11 @@ function Ide(props) {
         <button onClick={handleDrawer} data-tip data-for="fileSystem" type="button" className="btn btn-secondary mb-1" style={{ maxHeight: '40px', width: '40px', borderRadius: '5px' /*, boxShadow : '0px 0px 3px 3px gray'*/ }}><i class="fas fa-copy"></i></button>
         <ReactTooltip id="fileSystem" place="top" effect="solid" backgroundColor="white" textColor="black">File System</ReactTooltip>
 
-        <button data-tip data-for="communication" type="button" className="btn btn-secondary mb-1 " style={{ maxHeight: '40px', width: '40px', borderRadius: '5px' }}><i class="fas fa-comments"></i></button>
-        <ReactTooltip id="communication" place="right" effect="solid" backgroundColor="white" textColor="black">Communication</ReactTooltip>
+        <Link to="/default/communication">
+          <button data-tip data-for="communication" type="button" className="btn btn-secondary mb-1 " style={{ maxHeight: '40px', width: '40px', borderRadius: '5px' }}><i class="fas fa-comments"></i></button>
+          <ReactTooltip id="communication" place="right" effect="solid" backgroundColor="white" textColor="black">Communication</ReactTooltip>
+        </Link>
+
 
         <button data-tip data-for="liveShare" type="button" className="btn btn-secondary mb-1 " style={{ maxHeight: '40px', width: '40px', borderRadius: '5px' }}><i class="fas fa-share-square"></i></button>
         <ReactTooltip id="liveShare" place="right" effect="solid" backgroundColor="white" textColor="black">Live Share</ReactTooltip>
@@ -159,6 +246,7 @@ function Ide(props) {
           <Editor
             theme="vs-dark"
             options={options}
+            defaultLanguage="python"
           />
         </div>
 
