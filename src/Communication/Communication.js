@@ -53,15 +53,16 @@ class Communication extends React.Component {
             },
             myVideo: document.createElement('video'),
             myPeer: new Peer(undefined, {
-                host: '/',
-                port: '9000'
+                host: 'peerjs-server.herokuapp.com',
+                port:443,
+                secure:true,    
             }),
             AudioMute: 0,
             VideoMute: 0,
             VoiceActive: -1,
             CallingMode: 0,
             Peers: {},
-            Videos: {}
+            Videos: {},
         };
 
 
@@ -91,9 +92,10 @@ class Communication extends React.Component {
 
 
         this.socketRef = React.createRef(null);
-        this.socketRef.current = socketio.connect("http://localhost:4000");
+        this.socketRef.current = socketio.connect("https://communication.colab.cf/");
 
         this.state.myPeer.on('open', id => {
+            console.log("XX: " + id);
             this.setState({
                 userId: id
             })
@@ -107,6 +109,7 @@ class Communication extends React.Component {
           })
 
         this.socketRef.current.on('user-connected', userId => {
+            console.log(userId);
             if (userId != this.state.userId && this.state.VoiceActive != -1) {
                 navigator.mediaDevices.getUserMedia({
                     video: (!this.state.VideoMute),
@@ -130,6 +133,7 @@ class Communication extends React.Component {
                     })
                 })
                 this.state.Videos[call.peer] = video;
+                console.log(call.peer + " " + " stream");
             }
         })
 
@@ -216,10 +220,7 @@ class Communication extends React.Component {
 
     connectToNewUser = (userId, stream) => {
         const call = this.state.myPeer.call(userId, stream)
-        var img = document.createElement("img");
-        img.src = this.state.photo;
         const video = document.createElement('video')
-        video.appendChild(img);
         call.on('stream', userVideoStream => {
             this.addVideoStream(video, userVideoStream)
         })

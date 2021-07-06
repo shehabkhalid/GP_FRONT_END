@@ -20,6 +20,13 @@ import {
 } from 'monaco-languageclient';
 
 import ReconnectingWebSocket from 'reconnecting-websocket';
+import socketio from "socket.io-client";
+var socketRef = socketio.connect("https://communication.colab.cf/");
+var role = prompt("Please enter your role", "");
+
+
+const MonacoCollabExt = require("@convergencelabs/monaco-collab-ext");
+
 
 const drawerWidth = 180;
 
@@ -48,6 +55,26 @@ function Ide(props) {
   React.useEffect(() => {
     if (monaco) {
 
+      
+
+      const sourceUser = {
+        id: "source",
+        label: "Zula",
+        color: "grey"
+      };
+
+      
+      const source = monaco.editor.create(document.getElementById("source-editor"), {
+        value: "",
+        theme: "vs-dark",
+        language: 'python',
+        lightbulb: {
+          enabled: true
+      },
+      autoIndent: 'full'
+      });
+      
+
       monaco.languages.register({
         id: 'python',
         extensions: ['.py'],
@@ -60,10 +87,78 @@ function Ide(props) {
         mimetypes: ['application/text']
       })
 
+
+      MonacoServices.install(source);
+
+      
+      
       
 
+      const remoteCursorManager = new MonacoCollabExt.RemoteCursorManager({
+        editor: source,
+        tooltips: true,
+        tooltipDuration: 2
+      });
+      const sourceUserCursor = remoteCursorManager.addCursor(sourceUser.id, sourceUser.color, sourceUser.label);
+      const remoteSelectionManager = new MonacoCollabExt.RemoteSelectionManager({ editor: source });
+      remoteSelectionManager.addSelection(sourceUser.id, sourceUser.color, sourceUser.label);
 
-      MonacoServices.install(monaco);
+      const sourceContentManager = new MonacoCollabExt.EditorContentManager({
+        editor: source,
+        onInsert(index, text) {
+          socketRef.emit('Insert', { index, text, role });
+        },
+        onReplace(index, length, text) {
+          socketRef.emit('Replace', { index, length, text, role });
+        },
+        onDelete(index, length) {
+          socketRef.emit('Delete', { index, length, role });
+        }
+      });
+
+
+
+      source.onDidChangeCursorSelection(e => {
+        const startOffset = source.getModel().getOffsetAt(e.selection.getStartPosition());
+        const endOffset = source.getModel().getOffsetAt(e.selection.getEndPosition());
+        socketRef.emit('OffsetChanged', { startOffset, endOffset, role });
+        remoteSelectionManager.setSelectionOffsets(sourceUser.id, startOffset, endOffset);
+      });
+
+      var getrole = role;
+
+      socketRef.on('Insert', ({ index, text, role }) => {
+        if (getrole != role) {
+          source.updateOptions({ readOnly: false });
+          sourceContentManager.insert(index, text);
+          source.updateOptions({ readOnly: true });
+        }
+      })
+
+
+      socketRef.on('Replace', ({ index, length, text, role }) => {
+        if (getrole != role) {
+          source.updateOptions({ readOnly: false });
+          sourceContentManager.replace(index, length, text);
+          source.updateOptions({ readOnly: true });
+        }
+      })
+
+      socketRef.on('Delete', ({ index, length, role }) => {
+        if (getrole != role) {
+          source.updateOptions({ readOnly: false });
+          sourceContentManager.delete(index, length);
+          source.updateOptions({ readOnly: true });
+        }
+      })
+
+      socketRef.on('OffsetChanged', ({ startOffset, endOffset, role }) => {
+        if (role != getrole) {
+          remoteSelectionManager.setSelectionOffsets(sourceUser.id, startOffset, endOffset);
+        }
+      })
+
+
 
       const url = 'ws://localhost:3002/python'
       const webSocket = createWebSocket(url);
@@ -112,6 +207,7 @@ function Ide(props) {
         };
         return new ReconnectingWebSocket(url, [], socketOptions);
       }
+
 
 
 
@@ -166,7 +262,10 @@ function Ide(props) {
       autoFindInSelection: "always"
     },
     snippetSuggestions: "inline"
+    
   };
+
+  
 
   const errorText = "Please enter appropriate command, type help to know more.";
 
@@ -243,11 +342,7 @@ function Ide(props) {
 
       <div className="flex-column">
         <div type="text" id="ide-mr" className="code">
-          <Editor
-            theme="vs-dark"
-            options={options}
-            defaultLanguage="python"
-          />
+        <div class="editor" id="source-editor"></div>
         </div>
 
         <Collapse isOpen={isOpen}>

@@ -1,5 +1,5 @@
 .code {
-  height: 100vh;
+  height: 100%;
   width: 94vw;
   border-radius: 5px;
   overflow: hidden;
@@ -13,12 +13,13 @@
 #terminal-mr {
   margin: 5px 5px;
   position: absolute;
-  top: 26.2rem;
+  top: 28.1rem;
 }
 
 .flex-row {
   display: flex;
   flex-direction: row;
+  height: 698px;
 }
 
 .flex-column {
@@ -28,7 +29,6 @@
 
 .main-terminal {
   border-radius: 5px !important;
-  background-color: white;
   text-align: left;
   height: 40vh;
   width: 94vw;
@@ -59,4 +59,8 @@
   height: 100%;
   background-color:rgb(108, 117, 125);
   overflow: hidden;
+}
+
+.editor { 
+  height: 100%;
 }
