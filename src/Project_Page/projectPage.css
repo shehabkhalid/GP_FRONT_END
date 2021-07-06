@@ -64,3 +64,12 @@
 .editor { 
   height: 100%;
 }
+
+#CamDiv { 
+  box-shadow: 0px 0px 3px 3px rgb(200, 200, 200);
+  height: 300px;
+  width: 300px;
+  background-color: red;
+  z-index: 9;
+  position: absolute;
+}

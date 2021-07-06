@@ -54,8 +54,8 @@ class Communication extends React.Component {
             myVideo: document.createElement('video'),
             myPeer: new Peer(undefined, {
                 host: 'peerjs-server.herokuapp.com',
-                port:443,
-                secure:true,    
+                port: 443,
+                secure: true,
             }),
             AudioMute: 0,
             VideoMute: 0,
@@ -103,13 +103,41 @@ class Communication extends React.Component {
 
         this.socketRef.current.on('user-disconnected', userId => {
             console.log("dis: " + userId);
-            if (this.state.Videos[userId] && userId != this.state.userId) {
-            this.state.Videos[userId].remove();
-            }
-          })
 
-        this.socketRef.current.on('user-connected', userId => {
-            console.log(userId);
+            for (var i = 0; i < this.state.activeUsers[this.state.VoiceActive].length; i++) {
+                if (this.state.activeUsers[this.state.VoiceActive][i].userId == userId) {
+                    this.state.activeUsers[this.state.VoiceActive].splice(i, 1);
+                    break;
+                }
+            }
+            this.setState({
+
+            })
+            if (this.state.Videos[userId] && userId != this.state.userId) {
+                this.state.Videos[userId].remove();
+            }
+        })
+
+        this.socketRef.current.on('connection', ({ userId, user, photo }) => {
+            console.log("cc: " + this.state.VoiceActive + " " + userId + " " + user + " " + photo);
+            this.state.activeUsers[this.state.VoiceActive].push({
+                userId: userId,
+                user: user,
+                photo: photo
+            });
+            this.setState({
+            })
+        })
+
+        this.socketRef.current.on('user-connected', ({ userId, user, photo }) => {
+            this.state.activeUsers[this.state.VoiceActive].push({
+                userId: userId,
+                user: user,
+                photo: photo
+            });
+            this.setState({
+
+            })
             if (userId != this.state.userId && this.state.VoiceActive != -1) {
                 navigator.mediaDevices.getUserMedia({
                     video: (!this.state.VideoMute),
@@ -265,8 +293,20 @@ class Communication extends React.Component {
         ChannelBox.style.height = "94%";
         ConnectionBox.style.height = "0%";
 
-        this.state.activeUsers[this.state.VoiceActive].splice(this.state.activeUsers[this.state.VoiceActive].indexOf(x => x.name == this.state.name));
+        for (var i = 0; i < this.state.activeUsers[this.state.VoiceActive].length; i++) {
+            console.log(i + " " + this.state.activeUsers[this.state.VoiceActive][i].userId);
+            if (this.state.activeUsers[this.state.VoiceActive][i].userId == this.state.userId) {
+                this.state.activeUsers[this.state.VoiceActive].splice(i, 1);
+                break;
+            }
+        }
 
+        const myNode = document.getElementById("video-grid");
+        while (myNode.firstChild) {
+            myNode.removeChild(myNode.lastChild);
+        }
+
+        this.state.activeUsers[this.state.VoiceActive].length = 0;
 
         this.setState({
             VoiceActive: -1
@@ -281,17 +321,49 @@ class Communication extends React.Component {
         console.log(e.target.id);
         const s = this.Channels.find(x => x.id == e.target.id).type;
         if (s == 0) {
+            var elmnt = document.getElementById('video-grid');
+            if (elmnt != null) {
+                var children = elmnt.children;
+                for (var i = 0; i < children.length; i++) {
+                    var child = children[i];
+                    if (child.style.visibility  === "hidden") {
+                        child.style.visibility  = "visible";
+                    } else {
+                        child.style.visibility  = "hidden";
+                    }
+                }
+            }
+            
+            this.setState({
+                VoiceActive: e.target.id,
+                CallingMode: 1
+            })
+
+            
+
             if (this.state.activeChannel != null) {
                 this.state.activeChannel.classList.remove('active');
             }
 
+
             if (this.state.VoiceActive != e.target.id) {
 
+
+
                 if (this.state.VoiceActive != -1) {
-                    this.state.activeUsers[this.state.VoiceActive].splice(this.state.activeUsers[this.state.VoiceActive].indexOf(x => x.name == this.state.name));
+                    for (var i = 0; i < this.state.activeUsers[this.state.VoiceActive].length; i++) {
+                        console.log(i + " " + this.state.activeUsers[this.state.VoiceActive][i].userId);
+                        if (this.state.activeUsers[this.state.VoiceActive][i].userId == this.state.userId) {
+                            this.state.activeUsers[this.state.VoiceActive].splice(i, 1);
+                            break;
+                        }
+                    }
                 }
 
+               
+
                 this.state.activeUsers[e.target.id].push({
+                    userId: this.state.userId,
                     user: this.state.user,
                     photo: this.state.photo
                 });
@@ -303,19 +375,17 @@ class Communication extends React.Component {
                 ChannelBox.style.height = "88%";
                 ConnectionBox.style.height = "6%";
 
-                this.setState({
-                    VoiceActive: e.target.id,
-                    CallingMode: 1
-                })
-
-                this.socketRef.current.emit('join-room', e.target.id, this.state.userId)
-
                
+
+                this.socketRef.current.emit('join-room', e.target.id, this.state.userId, this.state.user, this.state.photo)
+
+
                 navigator.mediaDevices.getUserMedia({
                     video: (!this.state.VideoMute),
-                    audio: (!this.state.AudioMute)
+                    audio: 0
                 }).then(stream => {
                     this.addVideoStream(this.state.myVideo, stream);
+
                 })
             }
         }
@@ -330,7 +400,22 @@ class Communication extends React.Component {
             })
 
 
+            var elmnt = document.getElementById('video-grid');
+            if (elmnt != null) {
+                var children = elmnt.children;
+                for (var i = 0; i < children.length; i++) {
+                    var child = children[i];
+                    if (child.style.visibility  === "hidden") {
+                        child.style.visibility  = "visible";
+                    } else {
+                        child.style.visibility  = "hidden";
+                    }
+                }
+            }
+
+
         }
+
 
         this.setState({
             currChannel: e.target.id,
@@ -350,7 +435,9 @@ class Communication extends React.Component {
                     <button data-tip data-for="fileSystem" type="button" className="btn btn-secondary mb-1" style={{ maxHeight: '40px', width: '40px', borderRadius: '5px' /*, boxShadow : '0px 0px 3px 3px gray'*/ }}><i class="fas fa-copy"></i></button>
                     <ReactTooltip id="fileSystem" place="top" effect="solid" backgroundColor="white" textColor="black">File System</ReactTooltip>
 
-                    <Link to="/default/communication">
+                    <Link to={{
+                        pathname: "/default/ide",
+                    }}>
                         <button data-tip data-for="communication" type="button" className="btn btn-secondary mb-1 " style={{ maxHeight: '40px', width: '40px', borderRadius: '5px' }}><i class="fas fa-comments"></i></button>
                         <ReactTooltip id="communication" place="right" effect="solid" backgroundColor="white" textColor="black">Communication</ReactTooltip>
                     </Link>

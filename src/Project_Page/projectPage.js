@@ -21,7 +21,7 @@ import {
 
 import ReconnectingWebSocket from 'reconnecting-websocket';
 import socketio from "socket.io-client";
-var socketRef = socketio.connect("https://communication.colab.cf/");
+var socketRef = socketio.connect("localhost:4000");
 var role = prompt("Please enter your role", "");
 
 
@@ -51,11 +51,21 @@ const useStyles = makeStyles((theme) => ({
 
 function Ide(props) {
 
+  var stream = useState();
+  var video = document.getElementById('CamDiv');
+  if (video != null) {
+    video.srcObject = stream
+    video.addEventListener('loadedmetadata', () => {
+      video.play()
+    })
+  }
+
+
   const monaco = useMonaco();
   React.useEffect(() => {
     if (monaco) {
 
-      
+
 
       const sourceUser = {
         id: "source",
@@ -63,17 +73,17 @@ function Ide(props) {
         color: "grey"
       };
 
-      
+
       const source = monaco.editor.create(document.getElementById("source-editor"), {
         value: "",
         theme: "vs-dark",
         language: 'python',
         lightbulb: {
           enabled: true
-      },
-      autoIndent: 'full'
+        },
+        autoIndent: 'full'
       });
-      
+
 
       monaco.languages.register({
         id: 'python',
@@ -90,9 +100,9 @@ function Ide(props) {
 
       MonacoServices.install(source);
 
-      
-      
-      
+
+
+
 
       const remoteCursorManager = new MonacoCollabExt.RemoteCursorManager({
         editor: source,
@@ -128,6 +138,7 @@ function Ide(props) {
       var getrole = role;
 
       socketRef.on('Insert', ({ index, text, role }) => {
+        console.log("Role : " + index + " " + test + " " + role);
         if (getrole != role) {
           source.updateOptions({ readOnly: false });
           sourceContentManager.insert(index, text);
@@ -262,15 +273,67 @@ function Ide(props) {
       autoFindInSelection: "always"
     },
     snippetSuggestions: "inline"
-    
+
   };
 
-  
+
 
   const errorText = "Please enter appropriate command, type help to know more.";
 
-  
 
+
+  const dragElement = (elmnt) => {
+
+    var pos1 = 0, pos2 = 0, pos3 = 0, pos4 = 0;
+
+    const closeDragElement = () => {
+      // stop moving when mouse button is released:
+      document.onmouseup = null;
+      document.onmousemove = null;
+    }
+
+
+    const elementDrag = (e) => {
+      e = e || window.event;
+      e.preventDefault();
+      // calculate the new cursor position:
+      pos1 = pos3 - e.clientX;
+      pos2 = pos4 - e.clientY;
+      pos3 = e.clientX;
+      pos4 = e.clientY;
+      // set the element's new position:
+      elmnt.style.top = (elmnt.offsetTop - pos2) + "px";
+      elmnt.style.left = (elmnt.offsetLeft - pos1) + "px";
+    }
+
+    const dragMouseDown = (e) => {
+      e = e || window.event;
+      e.preventDefault();
+      // get the mouse cursor position at startup:
+      pos3 = e.clientX;
+      pos4 = e.clientY;
+      document.onmouseup = closeDragElement;
+      // call a function whenever the cursor moves:
+      document.onmousemove = elementDrag;
+    }
+
+
+    if (elmnt == null)
+      console.log('rest');
+    if (document.getElementById(elmnt.id)) {
+      // if present, the header is where you move the DIV from:
+      document.getElementById(elmnt.id).onmousedown = dragMouseDown;
+    } else {
+      // otherwise, move the DIV from anywhere inside the DIV:
+      elmnt.onmousedown = dragMouseDown;
+    }
+
+
+  }
+
+  var elmnt = document.getElementById("CamDiv");
+  if (elmnt != null)
+    dragElement(elmnt);
 
   return (
     <div className="flex-row">
@@ -342,7 +405,7 @@ function Ide(props) {
 
       <div className="flex-column">
         <div type="text" id="ide-mr" className="code">
-        <div class="editor" id="source-editor"></div>
+          <div class="editor" id="source-editor"></div>
         </div>
 
         <Collapse isOpen={isOpen}>
@@ -359,6 +422,10 @@ function Ide(props) {
             />
           </div>
         </Collapse>
+
+      </div>
+
+      <div id="CamDiv">
 
       </div>
 
