@@ -21,7 +21,7 @@ import {
 
 import ReconnectingWebSocket from 'reconnecting-websocket';
 import socketio from "socket.io-client";
-var socketRef = socketio.connect("localhost:4000");
+var socketRef = socketio.connect("https://communication.colab.cf/");
 var role = prompt("Please enter your role", "");
 
 
@@ -138,7 +138,6 @@ function Ide(props) {
       var getrole = role;
 
       socketRef.on('Insert', ({ index, text, role }) => {
-        console.log("Role : " + index + " " + test + " " + role);
         if (getrole != role) {
           source.updateOptions({ readOnly: false });
           sourceContentManager.insert(index, text);
@@ -422,10 +421,6 @@ function Ide(props) {
             />
           </div>
         </Collapse>
-
-      </div>
-
-      <div id="CamDiv">
 
       </div>
 
