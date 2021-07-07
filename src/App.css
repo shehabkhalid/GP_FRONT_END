@@ -1,3 +1,11 @@
+html, body, #root, .App {
+  height: 100%;
+  width: 100%;
+  padding: 0;
+  margin: 0;
+}
+
+
 .header {
   text-align: center;
 }
@@ -68,4 +76,20 @@ textarea:focus {
   font-size: 20px;
   text-align: start;
   margin-left: 20px;
+}
+
+.fade {
+  opacity: 0;
+  animation: grow 0.2s ease-in-out forwards;
+  -webkit-animation: grow 0.2s ease-in-out forwards;
+}
+@-webkit-keyframes grow {
+  to {
+    opacity: 1;
+  }
+}
+@keyframes grow {
+  to {
+    opacity: 1;
+  }
 }

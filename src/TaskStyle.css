@@ -1,0 +1,17 @@
+.task-card {
+    border: none;
+    background-color: inherit;
+}
+
+.task-card-body {
+    padding: 5px;
+}
+
+.task-card-title {
+    font-weight: bold;
+}
+
+.task-card-body-text {
+    margin-bottom: 8px;
+    font-size: 18px;
+}
