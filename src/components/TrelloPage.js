@@ -1,123 +1,111 @@
-import React, { useState } from 'react'
-import initialData from '../initial-data'
-import Column from './Column'
-import { DragDropContext } from 'react-beautiful-dnd'
-import Styled from 'styled-components'
-
-const Container = Styled.div`
-    display: flex;
-    flex-direction: row;
-    flex-wrap: wrap;
-`
+import React, { useContext } from "react";
+import Column from "./Column";
+import { DragDropContext } from "react-beautiful-dnd";
+import { CardDeck } from "react-bootstrap";
+import TasksContext from "../TasksContext/TasksContext";
+import Aux from "../hoc/Auxiliary";
+import SideBar from "../newComponents/SideBar";
 
 const TrelloPage = () => {
-    const [ tasksData, setTasksData ] = useState(initialData)
-    const onDragEnd = result => {
-        const { destination, source , draggableId } = result
-        
-        if(!destination){
-            return
-        }
-        if(destination.droppableId === source.droppableId && destination.index === source.index){
-            return
-        }
-        const start = tasksData.columns[source.droppableId]
-        const finish = tasksData.columns[destination.droppableId]
+  const tasksContext = useContext(TasksContext);
 
-        if(start === finish) {
-            const newTaskIds = Array.from(start.taskIds)
-            newTaskIds.splice(source.index, 1)
-            newTaskIds.splice(destination.index, 0, draggableId)
+  const onDragEnd = (result) => {
+    const { destination, source, draggableId } = result;
 
-            const newColumn = {
-                ...start,
-                taskIds: newTaskIds
-            }
+    if (!destination) {
+      return;
+    }
+    if (
+      destination.droppableId === source.droppableId &&
+      destination.index === source.index
+    ) {
+      return;
+    }
+    const start = tasksContext.state.columns[source.droppableId];
+    const finish = tasksContext.state.columns[destination.droppableId];
 
-            const newData = {
-                ...tasksData,
-                columns: {
-                    ...tasksData.columns,
-                    [newColumn.id]: newColumn
-                }
-            }
+    if (start === finish) {
+      const newTaskIds = Array.from(start.taskIds);
+      newTaskIds.splice(source.index, 1);
+      newTaskIds.splice(destination.index, 0, draggableId);
 
-            setTasksData(newData)
-            return
-        }
+      const newColumn = {
+        ...start,
+        taskIds: newTaskIds,
+      };
 
-        const startTaskIds = Array.from(start.taskIds)
-        startTaskIds.splice(source.index, 1)
-        const newStart = {
-            ...start,
-            taskIds: startTaskIds
-        }
+      const newData = {
+        ...tasksContext.state,
+        columns: {
+          ...tasksContext.state.columns,
+          [newColumn.id]: newColumn,
+        },
+      };
 
-        const finishTaskIds = Array.from(finish.taskIds)
-        finishTaskIds.splice(destination.index, 0, draggableId)
+      tasksContext.saveTasks(newData);
 
-        const newFinish = {
-            ...finish,
-            taskIds: finishTaskIds
-        }
-        const newData = {
-            ...tasksData,
-            columns: {
-                ...tasksData.columns,
-                [newStart.id]: newStart,
-                [newFinish.id]: newFinish
-            }
-        }
-        setTasksData(newData)
+      return;
     }
 
-    const addNewTask = (columnId, task) => {
-        const numOfTasks = Object.keys(tasksData.tasks).length + 1;
-        const column = tasksData.columns[columnId];
-        const columnTaskIds = Array.from(column.taskIds)
-        const taskId = 'task-' + numOfTasks
-        columnTaskIds.splice(column.taskIds.length, 1, taskId)
-        const newColumn = {
-            ...column,
-            taskIds: columnTaskIds
-        }
-        const newData = {
-            ...tasksData,
-            tasks: {
-                ...tasksData.tasks,
-                [taskId]: {id: taskId, title: task.title, description: task.description}
-            },
+    const startTaskIds = Array.from(start.taskIds);
+    startTaskIds.splice(source.index, 1);
+    const newStart = {
+      ...start,
+      taskIds: startTaskIds,
+    };
 
-            columns: {
-                ...tasksData.columns,
-                [newColumn.id]: newColumn
-            }
+    const finishTaskIds = Array.from(finish.taskIds);
+    finishTaskIds.splice(destination.index, 0, draggableId);
 
-        }
-    
-        setTasksData(newData)
-    }
-const InnerList = React.memo(({ column, taskMap, index }) => {
-    const tasks = column.taskIds.map(taskId => taskMap[taskId])
-    return <Column column={column} addNewTask={addNewTask} tasks={tasks} index={index} />
-})
+    const newFinish = {
+      ...finish,
+      taskIds: finishTaskIds,
+    };
+    const newData = {
+      ...tasksContext.state,
+      tasks: {
+        ...tasksContext.state.tasks,
+        [draggableId]: {
+          ...tasksContext.state.tasks[draggableId],
+          status: tasksContext.state.columns[destination.droppableId].title,
+        },
+      },
+      columns: {
+        ...tasksContext.state.columns,
+        [newStart.id]: newStart,
+        [newFinish.id]: newFinish,
+      },
+    };
+
+    tasksContext.saveTasks(newData);
+  };
+
+  const InnerList = React.memo(({ column, taskMap, index }) => {
+    const tasks = column.taskIds.map((taskId) => taskMap[taskId]);
     return (
-        <DragDropContext onDragEnd={onDragEnd}>
-            <Container>
-                {tasksData.columnOrder.map(columnId => {
-                    const column = tasksData.columns[columnId]
-                    
+      <Column key={column.id} column={column} tasks={tasks} index={index} />
+    );
+  });
+  return (
+    // <div style={{display:"flex"}}>
+    <DragDropContext onDragEnd={onDragEnd}>
+      <CardDeck style={{ margin: "0px" }}>
+        <SideBar />
+        {tasksContext.state.columnOrder.map((columnId) => {
+          const column = tasksContext.state.columns[columnId];
 
-                    return <InnerList
-                    key={column.id}
-                    column={column} 
-                    taskMap={tasksData.tasks} 
-                    />
-                })}
-            </Container>
-        </DragDropContext>
-    )
-    
-}
+          return (
+            <InnerList
+              key={column.id}
+              column={column}
+              taskMap={tasksContext.state.tasks}
+            />
+          );
+        })}
+      </CardDeck>
+    </DragDropContext>
+    // </div>
+  );
+};
 
 export default TrelloPage;
