@@ -26,7 +26,7 @@ const DefaultNavBar = () => {
             roundedCircle
           />
 
-          <NavDropdown title={"@" + userContext.state.username}>
+          <NavDropdown title={"@" + userContext.state.data.username}>
             <Link to="/default/profile">
               <NavDropdown.Item href="#action/3.1">Profile</NavDropdown.Item>
             </Link>

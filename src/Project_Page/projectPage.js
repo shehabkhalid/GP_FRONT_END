@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useContext, useEffect } from "react";
 import { useMonaco } from "@monaco-editor/react";
 import Terminal from "react-console-emulator";
 import { Drawer } from "@material-ui/core";
@@ -10,7 +10,8 @@ import { makeStyles, useTheme } from "@material-ui/core/styles";
 import { Collapse } from "reactstrap";
 import SideBar from "../newComponents/SideBar";
 import "./projectPage.css";
-
+import UserContext from "../Contexts/UserContext/UserContext";
+import projectAPI from "../API/project";
 import { listen } from "vscode-ws-jsonrpc";
 
 import {
@@ -50,6 +51,21 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 const Ide = (props) => {
+  const [state, setState] = useState([]);
+  const userContext = useContext(UserContext);
+  const getFiles = async () => {
+    const token = localStorage.getItem("accessToken");
+    const projectID = userContext.state.project._id;
+    const response = await projectAPI.getAllFilesNames(token, projectID);
+    if (!response.message) {
+      setState(response);
+    } else {
+      alert("Network Error, Please try again later.");
+    }
+  };
+
+  useEffect(() => getFiles(), []);
+
   var stream = useState();
   var video = document.getElementById("CamDiv");
   if (video != null) {
@@ -354,23 +370,10 @@ const Ide = (props) => {
             defaultCollapseIcon={<ExpandMoreIcon />}
             defaultExpandIcon={<ChevronRightIcon />}
           >
-            <TreeItem nodeId="1" label="public">
-              <TreeItem
-                nodeId="2"
-                label="index.html"
-                style={{ color: "#000" }}
-              />
-              <TreeItem nodeId="3" label="manifest.json" />
-              <TreeItem nodeId="4" label="logo.png" />
-            </TreeItem>
-            <TreeItem nodeId="5" label="src">
-              <TreeItem nodeId="10" label="index.js" />
-              <TreeItem nodeId="6" label="component">
-                <TreeItem nodeId="7" label="tree">
-                  <TreeItem nodeId="8" label="tree-view.js" />
-                  <TreeItem nodeId="9" label="tree-item.js" />
-                </TreeItem>
-              </TreeItem>
+            <TreeItem nodeId="1" label={userContext.state.project.name}>
+              {state.map((file, index) => {
+                return <TreeItem nodeId={index + 2} label={file} />;
+              })}
             </TreeItem>
           </TreeView>
         </div>

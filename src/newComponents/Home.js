@@ -12,13 +12,13 @@ const Home = () => {
 
   const getProjects = async () => {
     const token = localStorage.getItem("accessToken");
-    const userID = userContext.state._id;
+    const userID = userContext.state.data._id;
     const response = await projectAPI.getProjects(token, userID);
     setState(response);
   };
 
   const displayProjectLanguage = (lang) => {
-    if (lang == "python") {
+    if (lang.toLowerCase() == "python") {
       return <SiPython />;
     } else {
       return <SiJavascript />;
