@@ -11,7 +11,7 @@ class App extends Component {
         <Switch>
           <Route exact path="/" component={Main} />
           <Route path="/default" component={Default} />
-          <Route path="terminal">
+          <Route path="/terminal">
             <Terminal runner={true} />
           </Route>
         </Switch>
