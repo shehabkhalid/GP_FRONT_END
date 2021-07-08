@@ -5,7 +5,7 @@ import "../App.css";
 import SideBar from "./SideBar";
 import Aux from "../hoc/Auxiliary";
 
-function CodeReview() {
+const CodeReview = () => {
   const CardHeaderContainer = Styled.div`
       display: flex;
       flex-direction: row;
@@ -119,5 +119,5 @@ function CodeReview() {
       </div>
     </div>
   );
-}
+};
 export default CodeReview;

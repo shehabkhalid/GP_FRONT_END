@@ -2,7 +2,7 @@ import React, { useContext } from "react";
 import Column from "./Column";
 import { DragDropContext } from "react-beautiful-dnd";
 import { CardDeck } from "react-bootstrap";
-import TasksContext from "../TasksContext/TasksContext";
+import TasksContext from "../Contexts/TasksContext/TasksContext";
 import Aux from "../hoc/Auxiliary";
 import SideBar from "../newComponents/SideBar";
 

@@ -1,5 +1,4 @@
 const ItemTypes = {
-    CARD: 'card'
-}
-
+  CARD: "card",
+};
 export default ItemTypes;

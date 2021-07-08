@@ -26,10 +26,8 @@ import ReconnectingWebSocket from "reconnecting-websocket";
 import socketio from "socket.io-client";
 var socketRef = socketio.connect("https://communication.colab.cf/");
 var role = 0;
-// prompt("Please enter your role", "");
 
 const MonacoCollabExt = require("@convergencelabs/monaco-collab-ext");
-
 const drawerWidth = 180;
 
 const useStyles = makeStyles((theme) => ({
@@ -51,7 +49,7 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-function Ide(props) {
+const Ide = (props) => {
   var stream = useState();
   var video = document.getElementById("CamDiv");
   if (video != null) {
@@ -183,6 +181,18 @@ function Ide(props) {
         }
       });
 
+      const createWebSocket = (url) => {
+        const socketOptions = {
+          maxReconnectionDelay: 10000,
+          minReconnectionDelay: 1000,
+          reconnectionDelayGrowFactor: 1.3,
+          connectionTimeout: 10000,
+          maxRetries: Infinity,
+          debug: false,
+        };
+        return new ReconnectingWebSocket(url, [], socketOptions);
+      };
+
       const url = "ws://localhost:3002/python";
       const webSocket = createWebSocket(url);
 
@@ -196,7 +206,7 @@ function Ide(props) {
         },
       });
 
-      function createLanguageClient(connection) {
+      const createLanguageClient = (connection) => {
         return new MonacoLanguageClient({
           name: "Sample Language Client",
           clientOptions: {
@@ -217,19 +227,7 @@ function Ide(props) {
             },
           },
         });
-      }
-
-      function createWebSocket(url) {
-        const socketOptions = {
-          maxReconnectionDelay: 10000,
-          minReconnectionDelay: 1000,
-          reconnectionDelayGrowFactor: 1.3,
-          connectionTimeout: 10000,
-          maxRetries: Infinity,
-          debug: false,
-        };
-        return new ReconnectingWebSocket(url, [], socketOptions);
-      }
+      };
 
       console.log("here is the monaco isntance:", monaco.languages);
     }
@@ -338,7 +336,7 @@ function Ide(props) {
   return (
     <div className="flex-row">
       <SideBar handleDrawer={handleDrawer} showRun={true} />
-      
+
       <Drawer
         className={classes.drawer}
         variant="persistent"
@@ -419,6 +417,6 @@ function Ide(props) {
       </div>
     </div>
   );
-}
+};
 
 export default Ide;

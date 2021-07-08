@@ -4,7 +4,7 @@ import Task from "./Task";
 import { Droppable } from "react-beautiful-dnd";
 import CreateTaskModal from "./CreateTaskModal";
 import { Modal, Button } from "react-bootstrap";
-import TasksContext from "../TasksContext/TasksContext";
+import TasksContext from "../Contexts/TasksContext/TasksContext";
 import "../ModalStyle.css";
 
 const Container = Styled.div`

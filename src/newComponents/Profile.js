@@ -12,7 +12,7 @@ import {
 import "../App.css";
 import { Link } from "react-router-dom";
 
-function Profile() {
+const Profile = () => {
   const [name] = useState("Ahmed Salama");
   const [userName] = useState("AhmedSalama135");
 
@@ -99,5 +99,5 @@ function Profile() {
       </Container>
     </div>
   );
-}
+};
 export default Profile;

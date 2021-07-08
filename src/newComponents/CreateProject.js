@@ -3,7 +3,7 @@ import { Button, ListGroup } from "react-bootstrap";
 import { Link } from "react-router-dom";
 import "../App.css";
 
-function CreateProject() {
+const CreateProject = () => {
   const [membersNames, setMembersNames] = useState([
     "Ahmed Hatem",
     "Ahmed Safwat",
@@ -159,6 +159,6 @@ function CreateProject() {
       </div>
     </div>
   );
-}
+};
 
 export default CreateProject;
