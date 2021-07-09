@@ -34,7 +34,6 @@ import
 
 import ReconnectingWebSocket from "reconnecting-websocket";
 import socketio from "socket.io-client";
-var socketRef = socketio.connect("https://communication.colab.cf/");
 
 
 const MonacoCollabExt = require("@convergencelabs/monaco-collab-ext");
@@ -62,10 +61,14 @@ const useStyles = makeStyles((theme) => ({
 const Ide = (props) =>
 {
   const [state, setState] = useState([]);
-  const [code, setCode] = useState("print('bla bla bla')")
+  const [code, setCode] = useState("")
   const editorRef = useRef(null);
 
   const userContext = useContext(UserContext);
+
+  
+  const socketRef = useRef(null);
+  socketRef.current = socketio.connect("https://communication.colab.cf/");
 
   var role = userContext.state.data._id;
   const getFiles = async () =>
@@ -129,18 +132,8 @@ const Ide = (props) =>
         color: "grey",
       };
 
-      // const source = monaco.editor.create(
-      //   document.getElementById("source-editor"),
-      //   {
-      //     value: "",
-      //     theme: "vs-dark",
-      //     language: "python",
-      //     lightbulb: {
-      //       enabled: true,
-      //     },
-      //     autoIndent: "full",
-      //   }
-      // );
+       //const source = document.getElementById("source-editor"); \
+
 
       monaco.languages.register(
         {
@@ -182,16 +175,15 @@ const Ide = (props) =>
         editor: editor,
         onInsert(index, text)
         {
-          socketRef.emit("Insert", { index, text, role });
-          console.log(role)
+          socketRef.current.emit("Insert", { index, text, role });
         },
         onReplace(index, length, text)
         {
-          socketRef.emit("Replace", { index, length, text, role });
+          socketRef.current.emit("Replace", { index, length, text, role });
         },
         onDelete(index, length)
         {
-          socketRef.emit("Delete", { index, length, role });
+          socketRef.current.emit("Delete", { index, length, role });
         },
       });
 
@@ -203,50 +195,41 @@ const Ide = (props) =>
         const endOffset = editor
           .getModel()
           .getOffsetAt(e.selection.getEndPosition());
-        socketRef.emit("OffsetChanged", { startOffset, endOffset, role });
-        remoteSelectionManager.setSelectionOffsets(
-          sourceUser.id,
-          startOffset,
-          endOffset
-        );
+        console.log(startOffset + " " + endOffset + role);
+        socketRef.current.emit("OffsetChanged", { startOffset, endOffset, role });
       });
 
       var getrole = role;
 
-      socketRef.on("Insert", ({ index, text, role }) => {
+      socketRef.current.on("Insert", ({ index, text, role }) => {
        console.log(getrole,role)
 
         if (getrole != role) {
-          source.updateOptions({ readOnly: false });
           sourceContentManager.insert(index, text);
-          editor.updateOptions({ readOnly: true });
         }
       });
 
-      socketRef.on("Replace", ({ index, length, text, role }) =>
+      socketRef.current.on("Replace", ({ index, length, text, role }) =>
       {
         if (getrole != role)
         {
-          editor.updateOptions({ readOnly: false });
           sourceContentManager.replace(index, length, text);
-          editor.updateOptions({ readOnly: true });
         }
       });
 
-      socketRef.on("Delete", ({ index, length, role }) =>
+      socketRef.current.on("Delete", ({ index, length, role }) =>
       {
         if (getrole != role)
         {
-          editor.updateOptions({ readOnly: false });
           sourceContentManager.delete(index, length);
-          editor.updateOptions({ readOnly: true });
         }
       });
 
-      socketRef.on("OffsetChanged", ({ startOffset, endOffset, role }) =>
+      socketRef.current.on("OffsetChanged", ({ startOffset, endOffset, role }) =>
       {
         if (role != getrole)
         {
+          console.log(editor);
           remoteSelectionManager.setSelectionOffsets(
             sourceUser.id,
             startOffset,
@@ -512,6 +495,7 @@ const Ide = (props) =>
       <div className="flex-column">
         <div type="text" id="ide-mr" className="code">
           <Editor
+            id="source-editor"
             onMount={handleEditorDidMount}
             value={code}
             theme="vs-dark"

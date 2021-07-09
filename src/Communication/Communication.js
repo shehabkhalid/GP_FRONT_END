@@ -1,4 +1,4 @@
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, useContext } from "react";
 import "./Communication.css";
 import TextFields from "@material-ui/icons/TextFields";
 import Peer from "peerjs";
@@ -13,12 +13,14 @@ import VideocamOffIcon from "@material-ui/icons/VideocamOff";
 import CallIcon from "@material-ui/icons/Call";
 import CallEndIcon from "@material-ui/icons/CallEnd";
 import SideBar from "../newComponents/SideBar";
+import UserContext from "../Contexts/UserContext/UserContext";
 
 const role = 0; //prompt("Please enter your role", "");
 
 const Communication = () => {
+  const userContext = useContext(UserContext);
   const [state, setState] = useState({
-    user: role == 0 ? "Zula" : "Baher",
+    user: userContext.state.data.username,
     photo:
       role == 0
         ? "https://i.ibb.co/pdDR6xp/80788212-1283452835189115-4401079097317392384-n-1.jpg"
@@ -54,12 +56,10 @@ const Communication = () => {
   socketRef.current = socketio.connect("https://communication.colab.cf/");
 
   state.myPeer.on("open", (id) => {
-    console.log("XX: " + id);
     setState({ ...state, userId: id });
   });
 
   socketRef.current.on("user-disconnected", (userId) => {
-    console.log("dis: " + userId);
     for (var i = 0; i < state.activeUsers[state.VoiceActive].length; i++) {
       if (state.activeUsers[state.VoiceActive][i].userId == userId) {
         state.activeUsers[state.VoiceActive].splice(i, 1);
@@ -73,9 +73,6 @@ const Communication = () => {
   });
 
   socketRef.current.on("connection", ({ userId, user, photo }) => {
-    console.log(
-      "cc: " + state.VoiceActive + " " + userId + " " + user + " " + photo
-    );
     state.activeUsers[state.VoiceActive].push({
       userId: userId,
       user: user,
@@ -123,6 +120,7 @@ const Communication = () => {
   });
 
   socketRef.current.on("message", ({ name, message, id, photo }) => {
+    console.log(name);
     state.modernm[id].push({
       message: message,
       user: name,
