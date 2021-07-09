@@ -251,7 +251,7 @@ const Ide = (props) =>
         return new ReconnectingWebSocket(url, [], socketOptions);
       };
 
-      const url = "ws://localhost:3000/python";
+      const url = "https://language.colab.cf/python";
       const webSocket = createWebSocket(url);
 
       listen({
