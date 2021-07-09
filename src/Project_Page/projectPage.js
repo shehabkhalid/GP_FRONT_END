@@ -33,7 +33,7 @@ import {
 import ReconnectingWebSocket from "reconnecting-websocket";
 import socketio from "socket.io-client";
 var socketRef = socketio.connect("https://communication.colab.cf/");
-var role = 0;
+
 
 const MonacoCollabExt = require("@convergencelabs/monaco-collab-ext");
 const drawerWidth = 180;
@@ -60,6 +60,7 @@ const useStyles = makeStyles((theme) => ({
 const Ide = (props) => {
   const [state, setState] = useState([]);
   const userContext = useContext(UserContext);
+  var role = userContext.state.data._id;
   const getFiles = async () => {
     const token = localStorage.getItem("accessToken");
     const projectID = userContext.state.project._id;
