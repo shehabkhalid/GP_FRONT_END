@@ -11,17 +11,17 @@ const TrelloPage = () => {
   const tasksContext = useContext(TasksContext);
   const userContext = useContext(UserContext);
 
-  const fetchTasks = async () => {
-    const token = localStorage.getItem("accessToken");
-    const projectID = userContext.state.project._id;
-    const response = await taskAPI.getTasks(token, projectID);
-    if (!response.message) {
-      console.log(response);
-      //tasksContext.saveTasks(response);
-    }
-  };
+  // const fetchTasks = async () => {
+  //   const token = localStorage.getItem("accessToken");
+  //   const projectID = userContext.state.project._id;
+  //   const response = await taskAPI.getTasks(token, projectID);
+  //   if (!response.message) {
+  //     console.log(response);
+  //     //tasksContext.saveTasks(response);
+  //   }
+  // };
 
-  useEffect(() => fetchTasks(), []);
+  // useEffect(() => fetchTasks(), []);
 
   const onDragEnd = (result) => {
     const { destination, source, draggableId } = result;

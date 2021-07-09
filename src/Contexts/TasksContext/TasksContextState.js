@@ -5,7 +5,7 @@ import initialData from "../../initial-data";
 const TasksContextState = (props) => {
   const [state, setState] = useState(initialData);
 
-  const saveTasks = (tasks) => setState(tasks);
+  const saveTasks = (state) => setState(state);
 
   const addNewTask = (columnId, task) => {
     const numOfTasks = Object.keys(state.tasks).length + 1;
