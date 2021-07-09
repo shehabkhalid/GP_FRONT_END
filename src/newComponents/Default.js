@@ -9,6 +9,7 @@ import Home from "./Home";
 import TasksContextState from "../Contexts/TasksContext/TasksContextState";
 import Communication from "../Communication/Communication";
 import DefaultNavBar from "./DefaultNavBar";
+import Account from "./Account";
 import Aux from "../hoc/Auxiliary";
 
 const Default = () => {
@@ -19,6 +20,7 @@ const Default = () => {
         <Route exact path="/default/home" component={Home} />
         <Route path="/default/code-review" component={CodeReview} />
         <Route path="/default/profile" component={Profile} />
+        <Route exact path="/default/account" component={Account} />
         <Route path="/default/create-project" component={CreateProject} />
         <Route path="/default/communication" component={Communication} />
         <Route path="/default/ide" component={Ide} />

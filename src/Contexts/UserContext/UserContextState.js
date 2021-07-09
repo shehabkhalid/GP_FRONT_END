@@ -3,7 +3,7 @@ import UserContext from "./UserContext";
 
 const UserContextState = (props) => {
   const [state, setState] = useState();
-  const saveData = (data) => setState({ data });
+  const saveData = (data) => setState({ ...state, data });
   const clearData = () => setState();
   const setProject = (project) => setState({ ...state, project });
   return (

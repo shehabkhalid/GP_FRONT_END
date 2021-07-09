@@ -12,7 +12,14 @@ import SideBar from "../newComponents/SideBar";
 import "./projectPage.css";
 import UserContext from "../Contexts/UserContext/UserContext";
 import projectAPI from "../API/project";
+import fileAPI from "../API/file";
 import { listen } from "vscode-ws-jsonrpc";
+import ReactTooltip from "react-tooltip";
+
+/////////////////////////////////fetched but not yet added to the ide
+/////////////////////////////////fetched but not yet added to the ide
+/////////////////////////////////fetched but not yet added to the ide
+/////////////////////////////////fetched but not yet added to the ide
 
 import {
   MonacoLanguageClient,
@@ -64,7 +71,23 @@ const Ide = (props) => {
     }
   };
 
-  useEffect(() => getFiles(), []);
+  const getFileData = async (filename) => {
+    const token = localStorage.getItem("accessToken");
+    const data = {
+      fileName: filename.split(".")[0],
+      projectId: userContext.state.project._id,
+    };
+    const response = await fileAPI.getFileDataByName(token, data);
+    if (!response.message) {
+      console.log(response);
+      /////////////////////////////////fetched but not yet added to the ide/////////////here
+    }
+  };
+
+  useEffect(() => {
+    getFiles();
+    window.scrollTo(0, 0);
+  }, []);
 
   var stream = useState();
   var video = document.getElementById("CamDiv");
@@ -351,7 +374,10 @@ const Ide = (props) => {
 
   return (
     <div className="flex-row">
-      <SideBar handleDrawer={handleDrawer} showRun={true} />
+      <SideBar
+        handleDrawer={handleDrawer}
+        showRun={true} /*saveLogic={} runLogic={} */
+      />
 
       <Drawer
         className={classes.drawer}
@@ -364,7 +390,7 @@ const Ide = (props) => {
         backgroundColor="rgb(108, 117, 125);"
         style={{ zIndex: "1" }}
       >
-        <div className="sidebar">
+        <div className="sidebar d-flex col">
           <TreeView
             className={classes.root}
             defaultCollapseIcon={<ExpandMoreIcon />}
@@ -372,10 +398,35 @@ const Ide = (props) => {
           >
             <TreeItem nodeId="1" label={userContext.state.project.name}>
               {state.map((file, index) => {
-                return <TreeItem nodeId={index + 2} label={file} />;
+                return (
+                  <TreeItem
+                    nodeId={index + 2}
+                    label={file}
+                    onClick={() => getFileData(file)}
+                  />
+                );
               })}
             </TreeItem>
           </TreeView>
+          {/* <button
+            data-tip
+            data-for="addFile"
+            type="button"
+            className="btn btn-secondary mb-1 m-1"
+            style={{ maxHeight: "40px", width: "40px", borderRadius: "5px" }}
+          >
+            <i class="fas fa-plus"></i>
+          </button>
+          <ReactTooltip
+            id="addFile"
+            place="right"
+            effect="solid"
+            backgroundColor="white"
+            textColor="black"
+          >
+            Add File
+          </ReactTooltip> */}
+          {/* for later  */}
         </div>
       </Drawer>
 

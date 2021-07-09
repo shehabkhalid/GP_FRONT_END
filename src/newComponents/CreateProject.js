@@ -23,7 +23,10 @@ const CreateProject = () => {
   const projectNameRef = useRef();
   const selectLanguageRef = useRef();
 
-  useEffect(() => getUsers(), []);
+  useEffect(() => {
+    getUsers();
+    window.scrollTo(0, 0);
+  }, []);
 
   const [List, setList] = useState([userContext.state.data]);
 

@@ -10,6 +10,7 @@ const SignIn = () => {
   useEffect(() => {
     localStorage.removeItem("accessToken");
     userContext.clearData();
+    window.scrollTo(0, 0);
   }, []);
 
   const emailRef = useRef();
@@ -31,8 +32,7 @@ const SignIn = () => {
       } else {
         memeRef.current.innerText = "Please check your email and password.";
       }
-    }
-    else{
+    } else {
       memeRef.current.innerText = "Please enter your email and password.";
     }
   };

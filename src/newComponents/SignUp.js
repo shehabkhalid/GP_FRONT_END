@@ -10,6 +10,7 @@ const SignUp = () => {
   useEffect(() => {
     localStorage.removeItem("accessToken");
     userContext.clearData();
+    window.scrollTo(0, 0);
   }, []);
 
   const usernameRef = useRef();
@@ -75,7 +76,12 @@ const SignUp = () => {
           type="password"
           placeholder="Password"
         />
+        <small id="passwordHelpBlock" class="form-text text-muted">
+          Your password must be 8-20, must contain a upper and lower case
+          letters, and a special character.
+        </small>
       </Form.Group>
+
       <p ref={memeRef} style={{ color: "red" }}></p>
       <Button className="shadow-sm rounded-0" variant="primary" type="submit">
         Submit

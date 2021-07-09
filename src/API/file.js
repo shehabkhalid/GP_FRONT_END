@@ -93,10 +93,50 @@ const deleteFile = async (token, fileId) => {
   }
 };
 
+const getFile = async (token, data) => {
+  try {
+    const result = await instance.get("/files", {
+      params: {
+        projectId: data.projectId,
+        fileName: data.fileName,
+      },
+
+      headers: {
+        Authorization: "Bearer " + token,
+      },
+    });
+
+    return result.data;
+  } catch (e) {
+    return { message: e.message };
+  }
+};
+
+const getFileDataByName = async (token, data) => {
+  try {
+    const result = await instance.get("/files/name", {
+      params: {
+        projectId: data.projectId,
+        fileName: data.fileName,
+      },
+
+      headers: {
+        Authorization: "Bearer " + token,
+      },
+    });
+
+    return result.data;
+  } catch (e) {
+    return { message: e.message };
+  }
+};
+
 export default {
   postFile,
   updateFileData,
   updateFileName,
   getFileData,
   deleteFile,
+  getFileDataByName,
+  getFile,
 };

@@ -6,7 +6,7 @@ import Aux from "../hoc/Auxiliary";
 
 const inIDE = "/default/ide";
 
-const SideBar = ({ showRun, handleDrawer }) => {
+const SideBar = ({ showRun, handleDrawer, saveLogic, runLogic }) => {
   const history = useHistory();
   console.log(history);
   const shouldRedirect = history.location.pathname != inIDE;
@@ -21,6 +21,7 @@ const SideBar = ({ showRun, handleDrawer }) => {
         data-tip
         data-for="run"
         type="button"
+        onClick={runLogic}
         className="btn btn-secondary mb-1 "
         style={{ maxHeight: "40px", width: "40px", borderRadius: "5px" }}
       >
@@ -35,6 +36,25 @@ const SideBar = ({ showRun, handleDrawer }) => {
       >
         Run Code
       </ReactTooltip>
+      <button
+        data-tip
+        data-for="save"
+        type="button"
+        className="btn btn-secondary mb-1 "
+        onClick={saveLogic}
+        style={{ maxHeight: "40px", width: "40px", borderRadius: "5px" }}
+      >
+        <i class="fas fa-save"></i>
+      </button>
+      <ReactTooltip
+        id="save"
+        place="right"
+        effect="solid"
+        backgroundColor="white"
+        textColor="black"
+      >
+        Save File
+      </ReactTooltip>
     </Aux>
   ) : null;
 
@@ -43,7 +63,7 @@ const SideBar = ({ showRun, handleDrawer }) => {
       class="btn-group-vertical justify-content-start bg-secondary"
       role="group"
       aria-label="Basic example"
-      style={{ padding: "2px" }}
+      style={{ padding: "2px", height: "100vh" }}
     >
       <button
         data-tip
