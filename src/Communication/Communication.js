@@ -1,158 +1,223 @@
-import React, { useState, useRef, useContext } from "react";
+import React, { useContext, useState, useRef, useEffect } from "react";
+import ReactTooltip from "react-tooltip";
 import "./Communication.css";
-import TextFields from "@material-ui/icons/TextFields";
-import Peer from "peerjs";
+import TextFields from '@material-ui/icons/TextFields'
+import Peer from 'peerjs'
+import { Link } from "react-router-dom";
 import socketio from "socket.io-client";
-import VolumeIcon from "@material-ui/icons/VolumeUp";
-import Message from "../Communication/Message";
-import MicIcon from "@material-ui/icons/Mic";
-import VideocamIcon from "@material-ui/icons/Videocam";
-import SettingsIcon from "@material-ui/icons/Settings";
-import MicOffIcon from "@material-ui/icons/MicOff";
-import VideocamOffIcon from "@material-ui/icons/VideocamOff";
-import CallIcon from "@material-ui/icons/Call";
-import CallEndIcon from "@material-ui/icons/CallEnd";
-import SideBar from "../newComponents/SideBar";
+import VolumeIcon from '@material-ui/icons/VolumeUp'
+import Message from '../Communication/Message'
+import MicIcon from '@material-ui/icons/Mic';
+import VideocamIcon from '@material-ui/icons/Videocam';
+import SettingsIcon from '@material-ui/icons/Settings';
+import MicOffIcon from '@material-ui/icons/MicOff';
+import VideocamOffIcon from '@material-ui/icons/VideocamOff';
+import CallIcon from '@material-ui/icons/Call';
+import CallEndIcon from '@material-ui/icons/CallEnd';
 import UserContext from "../Contexts/UserContext/UserContext";
 
-const role = 0; //prompt("Please enter your role", "");
+const role = 0;
 
-const Communication = () => {
-  const userContext = useContext(UserContext);
-  const [state, setState] = useState({
-    user: userContext.state.data.username,
-    photo:
-      role == 0
-        ? "https://i.ibb.co/pdDR6xp/80788212-1283452835189115-4401079097317392384-n-1.jpg"
-        : "https://i.ibb.co/jyBx1t5/baher.jpg",
-    currChannel: 1,
-    modernm: {
-      1: [],
-      2: [],
-      3: [],
-      4: [],
-    },
-    activeUsers: {
-      1: [],
-      2: [],
-      3: [],
-      4: [],
-    },
-    myVideo: document.createElement("video"),
-    myPeer: new Peer(undefined, {
-      host: "peerjs-server.herokuapp.com",
-      port: 443,
-      secure: true,
-    }),
-    AudioMute: 0,
-    VideoMute: 0,
-    VoiceActive: -1,
-    CallingMode: 0,
-    Peers: {},
-    Videos: {},
-  });
+class Communication extends React.Component {
+  static contextType = UserContext // assign static contextType
+  constructor(props) {
+    super(props);
+    this.state = {
+      photo: role == 0 ? 'https://i.ibb.co/pdDR6xp/80788212-1283452835189115-4401079097317392384-n-1.jpg' : 'https://i.ibb.co/jyBx1t5/baher.jpg',
+      currChannel: 1,
+      modernm: {
+        1: [
 
-  const socketRef = useRef(null);
-  socketRef.current = socketio.connect("https://communication.colab.cf/");
+        ],
+        2: [
 
-  state.myPeer.on("open", (id) => {
-    setState({ ...state, userId: id });
-  });
+        ],
+        3: [
 
-  socketRef.current.on("user-disconnected", (userId) => {
-    for (var i = 0; i < state.activeUsers[state.VoiceActive].length; i++) {
-      if (state.activeUsers[state.VoiceActive][i].userId == userId) {
-        state.activeUsers[state.VoiceActive].splice(i, 1);
-        break;
+        ],
+        4: [
+
+        ]
+      },
+      activeUsers: {
+        1: [
+
+        ],
+        2: [
+
+        ],
+        3: [
+
+        ],
+        4: [
+        ]
+      },
+      myVideo: document.createElement('video'),
+      myPeer: new Peer(undefined, {
+        host: 'peerjs-server.herokuapp.com',
+        port: 443,
+        secure: true,
+      }),
+      AudioMute: 0,
+      VideoMute: 0,
+      VoiceActive: -1,
+      CallingMode: 0,
+      Peers: {},
+      Videos: {},
+    };
+
+
+
+    /* navigator.mediaDevices.getUserMedia({
+         video: (!this.state.VideoMute),
+         audio: (!this.state.AudioMute)
+     }).then(stream => {
+         if (this.state.VoiceActive != -1) {
+         //this.addVideoStream(this.state.myVideo, stream)
+         
+        
+     }
+     this.state.myPeer.on('call', call => {
+         call.answer(stream)
+         const video = document.createElement('video')
+         call.on('stream', userVideoStream => {
+             this.addVideoStream(video, userVideoStream)
+         })
+     })
+         this.socketRef.current.on('user-connected', userId => {
+             this.connectToNewUser(userId, stream)
+             console.log("User ID: " + userId);
+         })
+     })*/
+
+
+
+
+    this.socketRef = React.createRef(null);
+    this.socketRef.current = socketio.connect("https://communication.colab.cf/");
+
+    this.state.myPeer.on('open', id => {
+      console.log("XX: " + id);
+      this.setState({
+        userId: id
+      })
+    })
+
+
+    this.socketRef.current.on('user-disconnected', userId => {
+      console.log("dis: " + userId);
+
+      for (var i = 0; i < this.state.activeUsers[this.state.VoiceActive].length; i++) {
+        if (this.state.activeUsers[this.state.VoiceActive][i].userId == userId) {
+          this.state.activeUsers[this.state.VoiceActive].splice(i, 1);
+          break;
+        }
       }
-    }
-    setState({ ...state });
-    if (state.Videos[userId] && userId != state.userId) {
-      state.Videos[userId].remove();
-    }
-  });
+      this.setState({
 
-  socketRef.current.on("connection", ({ userId, user, photo }) => {
-    state.activeUsers[state.VoiceActive].push({
-      userId: userId,
-      user: user,
-      photo: photo,
-    });
-    setState({ ...state });
-  });
+      })
+      if (this.state.Videos[userId] && userId != this.state.userId) {
+        this.state.Videos[userId].remove();
+      }
+    })
 
-  socketRef.current.on("user-connected", ({ userId, user, photo }) => {
-    state.activeUsers[state.VoiceActive].push({
-      userId: userId,
-      user: user,
-      photo: photo,
-    });
-    setState({ ...state });
-    if (userId != state.userId && state.VoiceActive != -1) {
-      navigator.mediaDevices
-        .getUserMedia({
-          video: !state.VideoMute,
-          audio: !state.AudioMute,
+    this.socketRef.current.on('connection', ({ userId, user, photo }) => {
+      console.log("cc: " + this.state.VoiceActive + " " + userId + " " + user + " " + photo);
+      this.state.activeUsers[this.state.VoiceActive].push({
+        userId: userId,
+        user: user,
+        photo: photo
+      });
+      this.setState({
+      })
+    })
+
+    this.socketRef.current.on('user-connected', ({ userId, user, photo }) => {
+      this.state.activeUsers[this.state.VoiceActive].push({
+        userId: userId,
+        user: user,
+        photo: photo
+      });
+      this.setState({
+
+      })
+      if (userId != this.state.userId && this.state.VoiceActive != -1) {
+        navigator.mediaDevices.getUserMedia({
+          video: (!this.state.VideoMute),
+          audio: (!this.state.AudioMute)
+        }).then(stream => {
+          this.connectToNewUser(userId, stream)
         })
-        .then((stream) => {
-          connectToNewUser(userId, stream);
-        });
-    }
-  });
+      }
+    })
 
-  state.myPeer.on("call", (call) => {
-    if (state.VoiceActive != -1) {
-      const video = document.createElement("video");
-      navigator.mediaDevices
-        .getUserMedia({
-          video: !state.VideoMute,
-          audio: !state.AudioMute,
+    this.state.myPeer.on('call', call => {
+      if (this.state.VoiceActive != -1) {
+        const video = document.createElement('video')
+        navigator.mediaDevices.getUserMedia({
+          video: (!this.state.VideoMute),
+          audio: (!this.state.AudioMute)
+        }).then(stream => {
+          call.answer(stream)
+          call.on('stream', userVideoStream => {
+            this.addVideoStream(video, userVideoStream)
+          })
         })
-        .then((stream) => {
-          call.answer(stream);
-          call.on("stream", (userVideoStream) => {
-            addVideoStream(video, userVideoStream);
-          });
-        });
-      state.Videos[call.peer] = video;
-      console.log(call.peer + " " + " stream");
-    }
-  });
+        this.state.Videos[call.peer] = video;
+        console.log(call.peer + " " + " stream");
+      }
+    })
 
-  socketRef.current.on("message", ({ name, message, id, photo }) => {
-    console.log(name);
-    state.modernm[id].push({
-      message: message,
-      user: name,
-      photo: photo,
-    });
-    setState({ ...state, x: " " });
-  });
 
-  let Channels = [
+
+    this.socketRef.current.on("message", ({ name, message, id, photo }) => {
+      this.state.modernm[id].push(
+        {
+          message: message,
+          user: name,
+          photo: photo
+        },
+      );
+      this.setState({ x: ' ' });
+    })
+
+  }
+
+  
+  componentDidMount() {
+    this.setState({ 
+      user: this.context.state.data.username
+    })
+  }
+
+
+  Channels = [
     {
       id: 1,
-      name: "Text 1",
-      type: 1,
+      name: 'Text 1',
+      type: 1
     },
     {
       id: 2,
-      name: "Text 2",
-      type: 1,
+      name: 'Text 2',
+      type: 1
     },
     {
       id: 3,
-      name: "Video",
-      type: 0,
+      name: 'Video',
+      type: 0
     },
     {
       id: 4,
-      name: "test",
-      type: 0,
-    },
-  ];
+      name: 'test',
+      type: 0
+    }
+  ]
 
-  const open = () => {
+
+
+
+  open() {
     var acc = document.getElementsByClassName("accordion");
     var i;
     for (i = 0; i < acc.length; i++) {
@@ -168,69 +233,70 @@ const Communication = () => {
         }
       });
     }
-  };
+  }
 
-  const Send = (e) => {
+
+
+  Send = (e) => {
     if (e.charCode == 13) {
       var ele = document.getElementById("myInput");
-      socketRef.current.emit("message", {
-        message: ele.value,
-        name: state.user,
-        id: state.currChannel,
-        photo: state.photo,
-      });
-      ele.value = "";
+      this.socketRef.current.emit('message', { message: ele.value, name: this.state.user, id: this.state.currChannel, photo: this.state.photo });
+      ele.value = '';
     }
-  };
+  }
 
-  const addVideoStream = (video, stream) => {
-    if (state.videoActive == 0) {
-      var videoGrid = document.getElementById("video-grid");
-      video.srcObject = stream;
-      video.addEventListener("loadedmetadata", () => {
-        video.play();
-      });
-      videoGrid.append(video);
+
+  addVideoStream = (video, stream) => {
+    if (this.state.videoActive == 0) {
+      var videoGrid = document.getElementById("video-grid")
+      video.srcObject = stream
+      video.addEventListener('loadedmetadata', () => {
+        video.play()
+      })
+      videoGrid.append(video)
     }
-  };
+  }
 
-  const connectToNewUser = (userId, stream) => {
-    const call = state.myPeer.call(userId, stream);
-    const video = document.createElement("video");
-    call.on("stream", (userVideoStream) => {
-      addVideoStream(video, userVideoStream);
-    });
-    state.Videos[userId] = video;
-    state.Peers[userId] = call;
-  };
+  connectToNewUser = (userId, stream) => {
+    const call = this.state.myPeer.call(userId, stream)
+    const video = document.createElement('video')
+    call.on('stream', userVideoStream => {
+      this.addVideoStream(video, userVideoStream)
+    })
+    this.state.Videos[userId] = video;
+    this.state.Peers[userId] = call;
+  }
 
-  const AudioMuteButton = (e) => {
-    navigator.mediaDevices
-      .getUserMedia({
-        video: 1 - state.VideoMute,
-        audio: state.AudioMute,
-      })
-      .then((stream) => {
-        addVideoStream(state.myVideo, stream);
-      });
+  AudioMuteButton = (e) => {
+    navigator.mediaDevices.getUserMedia({
+      video: 1 - this.state.VideoMute,
+      audio: this.state.AudioMute
+    }).then(stream => {
+      this.addVideoStream(this.state.myVideo, stream)
+    })
 
-    setState({ ...state, AudioMute: 1 - state.AudioMute });
-  };
+    this.setState({
+      AudioMute: (1 - this.state.AudioMute)
+    })
 
-  const VideoMuteButton = (e) => {
-    navigator.mediaDevices
-      .getUserMedia({
-        video: state.VideoMute,
-        audio: 1 - state.AudioMute,
-      })
-      .then((stream) => {
-        addVideoStream(state.myVideo, stream);
-      });
+  }
 
-    setState({ ...state, VideoMute: 1 - state.VideoMute });
-  };
+  VideoMuteButton = (e) => {
+    navigator.mediaDevices.getUserMedia({
+      video: this.state.VideoMute,
+      audio: 1 - this.state.AudioMute
+    }).then(stream => {
+      this.addVideoStream(this.state.myVideo, stream)
+    })
 
-  const Disconnect = (e) => {
+
+    this.setState({
+      VideoMute: (1 - this.state.VideoMute)
+    })
+
+  }
+
+  Disconnect = (e) => {
     var ChannelBox = document.getElementById("channel-box");
     var ConnectionBox = document.getElementById("connection-bar");
     var StatusBox = document.getElementById("status-bar");
@@ -238,10 +304,10 @@ const Communication = () => {
     ChannelBox.style.height = "94%";
     ConnectionBox.style.height = "0%";
 
-    for (var i = 0; i < state.activeUsers[state.VoiceActive].length; i++) {
-      console.log(i + " " + state.activeUsers[state.VoiceActive][i].userId);
-      if (state.activeUsers[state.VoiceActive][i].userId == state.userId) {
-        state.activeUsers[state.VoiceActive].splice(i, 1);
+    for (var i = 0; i < this.state.activeUsers[this.state.VoiceActive].length; i++) {
+      console.log(i + " " + this.state.activeUsers[this.state.VoiceActive][i].userId);
+      if (this.state.activeUsers[this.state.VoiceActive][i].userId == this.state.userId) {
+        this.state.activeUsers[this.state.VoiceActive].splice(i, 1);
         break;
       }
     }
@@ -251,21 +317,22 @@ const Communication = () => {
       myNode.removeChild(myNode.lastChild);
     }
 
-    state.activeUsers[state.VoiceActive].length = 0;
+    this.state.activeUsers[this.state.VoiceActive].length = 0;
 
-    setState({ ...state, VoiceActive: -1 });
+    this.setState({
+      VoiceActive: -1
+    })
 
-    var userId = state.userId;
-    var roomId = state.VoiceActive;
-    socketRef.current.emit("user-disconnected", roomId, userId);
-    state.myVideo.remove();
-  };
-
-  const clickChannel = (e) => {
+    var userId = this.state.userId;
+    var roomId = this.state.VoiceActive;
+    this.socketRef.current.emit('user-disconnected', roomId, userId);
+    this.state.myVideo.remove();
+  }
+  clickChannel = (e) => {
     console.log(e.target.id);
-    const s = Channels.find((x) => x.id == e.target.id).type;
+    const s = this.Channels.find(x => x.id == e.target.id).type;
     if (s == 0) {
-      var elmnt = document.getElementById("video-grid");
+      var elmnt = document.getElementById('video-grid');
       if (elmnt != null) {
         var children = elmnt.children;
         for (var i = 0; i < children.length; i++) {
@@ -278,35 +345,38 @@ const Communication = () => {
         }
       }
 
-      setState({ ...state, VoiceActive: e.target.id, CallingMode: 1 });
+      this.setState({
+        VoiceActive: e.target.id,
+        CallingMode: 1
+      })
 
-      if (state.activeChannel != null) {
-        state.activeChannel.classList.remove("active");
+
+
+      if (this.state.activeChannel != null) {
+        this.state.activeChannel.classList.remove('active');
       }
 
-      if (state.VoiceActive != e.target.id) {
-        if (state.VoiceActive != -1) {
-          for (
-            var i = 0;
-            i < state.activeUsers[state.VoiceActive].length;
-            i++
-          ) {
-            console.log(
-              i + " " + state.activeUsers[state.VoiceActive][i].userId
-            );
-            if (
-              state.activeUsers[state.VoiceActive][i].userId == state.userId
-            ) {
-              state.activeUsers[state.VoiceActive].splice(i, 1);
+
+      if (this.state.VoiceActive != e.target.id) {
+
+
+
+        if (this.state.VoiceActive != -1) {
+          for (var i = 0; i < this.state.activeUsers[this.state.VoiceActive].length; i++) {
+            console.log(i + " " + this.state.activeUsers[this.state.VoiceActive][i].userId);
+            if (this.state.activeUsers[this.state.VoiceActive][i].userId == this.state.userId) {
+              this.state.activeUsers[this.state.VoiceActive].splice(i, 1);
               break;
             }
           }
         }
 
-        state.activeUsers[e.target.id].push({
-          userId: state.userId,
-          user: state.user,
-          photo: state.photo,
+
+
+        this.state.activeUsers[e.target.id].push({
+          userId: this.state.userId,
+          user: this.state.user,
+          photo: this.state.photo
         });
 
         var ChannelBox = document.getElementById("channel-box");
@@ -316,33 +386,32 @@ const Communication = () => {
         ChannelBox.style.height = "88%";
         ConnectionBox.style.height = "6%";
 
-        socketRef.current.emit(
-          "join-room",
-          e.target.id,
-          state.userId,
-          state.user,
-          state.photo
-        );
 
-        navigator.mediaDevices
-          .getUserMedia({
-            video: !state.VideoMute,
-            audio: 0,
-          })
-          .then((stream) => {
-            addVideoStream(state.myVideo, stream);
-          });
+
+        this.socketRef.current.emit('join-room', e.target.id, this.state.userId, this.state.user, this.state.photo)
+
+
+        navigator.mediaDevices.getUserMedia({
+          video: (!this.state.VideoMute),
+          audio: 0
+        }).then(stream => {
+          this.addVideoStream(this.state.myVideo, stream);
+
+        })
       }
     }
 
     if (s == 1) {
-      if (state.activeChannel != null) {
-        state.activeChannel.classList.remove("active");
+      if (this.state.activeChannel != null) {
+        this.state.activeChannel.classList.remove('active');
       }
-      e.target.classList.add("active");
-      setState({ ...state, CallingMode: 0 });
+      e.target.classList.add('active');
+      this.setState({
+        CallingMode: 0
+      })
 
-      var elmnt = document.getElementById("video-grid");
+
+      var elmnt = document.getElementById('video-grid');
       if (elmnt != null) {
         var children = elmnt.children;
         for (var i = 0; i < children.length; i++) {
@@ -354,123 +423,138 @@ const Communication = () => {
           }
         }
       }
+
+
     }
 
-    setState({
-      ...state,
+
+    this.setState({
       currChannel: e.target.id,
       activeChannel: e.target,
-      videoActive: s,
+      videoActive: s
     });
-  };
+  }
 
-  return (
-    <div className="flex">
-      <SideBar />
-      <div id="main">
-        <div id="side-bar">
-          <div id="channel-box">
-            {Channels.map((currentChannel) => (
-              <React.Fragment>
-                <div class="channel-container">
-                  <div
-                    class="channel"
-                    id={currentChannel.id}
-                    onClick={clickChannel}
-                  >
-                    {currentChannel.type == 1 ? (
-                      <TextFields class="channel-icon"></TextFields>
-                    ) : (
-                      <VolumeIcon
-                        color="light"
-                        class="channel-icon"
-                      ></VolumeIcon>
-                    )}
-                    <div class="channel-name">{currentChannel.name}</div>
-                  </div>
-                  <div class="connected-users">
-                    {state.activeUsers[currentChannel.id].map((currentUser) => (
-                      <React.Fragment>
-                        <div class="connected-user">
-                          <img
-                            src={currentUser.photo}
-                            class="connected-avatar"
-                          ></img>
-                          <div class="connected-name"> {currentUser.user}</div>
-                        </div>
-                      </React.Fragment>
-                    ))}
-                  </div>
-                </div>
-              </React.Fragment>
-            ))}
-          </div>
-          <div id="connection-bar">
-            {state.VoiceActive == -1 ? (
-              <div></div>
-            ) : (
-              <React.Fragment>
-                <div id="connection-left">
-                  <CallIcon class="connection-icon"></CallIcon>
-                  <div class="connection-name">
-                    {Channels.find((x) => x.id == state.VoiceActive).name}
-                  </div>
-                </div>
-                <CallEndIcon
-                  onClick={Disconnect}
-                  class="Disconnect-icon"
-                ></CallEndIcon>
-              </React.Fragment>
-            )}
-          </div>
-          <div id="status-bar">
-            <div id="profile-status-bar">
-              <img src={state.photo} class="status-avatar"></img>
-              <div class="status-name"> {state.user}</div>
-            </div>
-            <div id="buttons-status-bar">
-              {state.AudioMute == 0 ? (
-                <MicIcon onClick={AudioMuteButton} class="status-icon" />
-              ) : (
-                <MicOffIcon onClick={AudioMuteButton} class="status-icon" />
-              )}
-              {state.VideoMute == 0 ? (
-                <VideocamIcon
-                  onClick={VideoMuteButton}
-                  class="status-icon"
-                ></VideocamIcon>
-              ) : (
-                <VideocamOffIcon
-                  onClick={VideoMuteButton}
-                  class="status-icon"
-                ></VideocamOffIcon>
-              )}
-              <SettingsIcon class="status-icon"></SettingsIcon>
-            </div>
-          </div>
+
+
+  render() {
+    return (
+      <div className="flex">
+
+        <div class="btn-group-vertical justify-content-start bg-secondary" role="group" aria-label="Basic example" style={{ padding: '2px' }}>
+
+          <button data-tip data-for="fileSystem" type="button" className="btn btn-secondary mb-1" style={{ maxHeight: '40px', width: '40px', borderRadius: '5px' /*, boxShadow : '0px 0px 3px 3px gray'*/ }}><i class="fas fa-copy"></i></button>
+          <ReactTooltip id="fileSystem" place="top" effect="solid" backgroundColor="white" textColor="black">File System</ReactTooltip>
+
+          <Link to={{
+            pathname: "/default/ide",
+          }}>
+            <button data-tip data-for="communication" type="button" className="btn btn-secondary mb-1 " style={{ maxHeight: '40px', width: '40px', borderRadius: '5px' }}><i class="fas fa-comments"></i></button>
+            <ReactTooltip id="communication" place="right" effect="solid" backgroundColor="white" textColor="black">Communication</ReactTooltip>
+          </Link>
+
+
+          <button data-tip data-for="liveShare" type="button" className="btn btn-secondary mb-1 " style={{ maxHeight: '40px', width: '40px', borderRadius: '5px' }}><i class="fas fa-share-square"></i></button>
+          <ReactTooltip id="liveShare" place="right" effect="solid" backgroundColor="white" textColor="black">Live Share</ReactTooltip>
+
+          <Link to="/default/code-review">
+            <button data-tip data-for="review" type="button" className="btn btn-secondary mb-1 " style={{ maxHeight: '40px', width: '40px', borderRadius: '5px' }}><i class="fas fa-pen"></i></button>
+            <ReactTooltip id="review" place="right" effect="solid" backgroundColor="white" textColor="black">Review</ReactTooltip>
+          </Link>
+
+          <Link to="/default/tasks">
+            <button data-tip data-for="tasks" type="button" className="btn btn-secondary mb-1 " style={{ maxHeight: '40px', width: '40px', borderRadius: '5px' }}><i class="fas fa-tasks"></i></button>
+            <ReactTooltip id="tasks" place="right" effect="solid" backgroundColor="white" textColor="black">Tasks</ReactTooltip>
+          </Link>
         </div>
 
-        {state.CallingMode == 1 ? (
-          <div id="video-grid"></div>
-        ) : (
-          <div id="content-bar">
-            <div id="messages-box">
-              {state.modernm[state.currChannel].map((message) => (
-                <Message
-                  user={message.user}
-                  message={message.message}
-                  photo={message.photo}
-                />
+        <div id="main">
+          <div id="side-bar">
+            <div id="channel-box">
+              {this.Channels.map((currentChannel) => (
+                <React.Fragment>
+                  <div class="channel-container">
+                    <div class="channel" id={currentChannel.id} onClick={this.clickChannel}>
+                      {currentChannel.type == 1 ? <TextFields class="channel-icon"></TextFields> : <VolumeIcon color="light" class="channel-icon"></VolumeIcon>}
+                      <div class="channel-name" >{currentChannel.name}</div>
+                    </div>
+                    <div class="connected-users">
+                      {
+                        this.state.activeUsers[currentChannel.id].map((currentUser) => (
+                          <React.Fragment>
+                            <div class="connected-user">
+                              <img src={currentUser.photo} class="connected-avatar"></img>
+                              <div class="connected-name"> {currentUser.user}</div>
+                            </div>
+                          </React.Fragment>
+                        ))
+                      }
+                    </div>
+                  </div>
+                </React.Fragment>
               ))}
             </div>
-            <div id="input-box">
-              <input onKeyPress={Send} id="myInput" class="input"></input>
+            <div id="connection-bar">
+              {this.state.VoiceActive == -1 ? <div></div> :
+                <React.Fragment>
+                  <div id="connection-left">
+                    <CallIcon class="connection-icon"></CallIcon>
+                    <div class="connection-name">{this.Channels.find(x => x.id == this.state.VoiceActive).name}</div>
+                  </div>
+                  <CallEndIcon onClick={this.Disconnect} class="Disconnect-icon"></CallEndIcon>
+                </React.Fragment>
+              }
+
+            </div>
+            <div id="status-bar">
+              <div id="profile-status-bar">
+                <img src={this.state.photo} class="status-avatar"></img>
+                <div class="status-name"> {this.state.user}</div>
+              </div>
+              <div id="buttons-status-bar">
+                {
+                  this.state.AudioMute == 0 ?
+                    <MicIcon onClick={this.AudioMuteButton} class="status-icon" />
+                    :
+                    <MicOffIcon onClick={this.AudioMuteButton} class="status-icon" />
+                }
+                {
+                  this.state.VideoMute == 0 ?
+                    <VideocamIcon onClick={this.VideoMuteButton} class="status-icon"></VideocamIcon>
+                    :
+                    <VideocamOffIcon onClick={this.VideoMuteButton} class="status-icon"></VideocamOffIcon>
+                }
+                <SettingsIcon class="status-icon"></SettingsIcon>
+              </div>
             </div>
           </div>
-        )}
+
+          {this.state.CallingMode == 1 ? <div id="video-grid"></div> :
+
+            <div id="content-bar">
+              <div id="messages-box">
+                {this.state.modernm[this.state.currChannel].map((message) => (
+                  <Message
+                    user={message.user}
+                    message={message.message}
+                    photo={message.photo}
+                  />
+                )
+                )}
+              </div>
+              <div id="input-box">
+                <input onKeyPress={this.Send} id="myInput" class="input"></input>
+              </div>
+            </div>
+          }
+
+        </div>
+
+
+
       </div>
-    </div>
-  );
-};
+    )
+  }
+}
 
 export default Communication;
