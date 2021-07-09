@@ -1,42 +1,82 @@
-import React, { useState } from "react";
+import React, { useState, useRef, useContext, useEffect } from "react";
 import { Button, ListGroup } from "react-bootstrap";
 import { Link } from "react-router-dom";
+import { useHistory } from "react-router";
 import "../App.css";
+import projectAPI from "../API/project";
+import userAPI from "../API/user";
+import UserContext from "../Contexts/UserContext/UserContext";
 
-function CreateProject() {
-  const [membersNames, setMembersNames] = useState([
-    "Ahmed Hatem",
-    "Ahmed Safwat",
-    "Ali Adel",
-    "Abdullah Baher",
-    "Ahmed Salama",
-    "Mohammed Hatem",
-    "Mohammed Amr",
-    "Salah Mustafa",
-    "Omar Khaled",
-    "Shehab Khaled",
-    "Beshoy Victor",
-    "Youssef Wael",
-  ]);
-  const [List, setList] = useState([]);
+const CreateProject = () => {
+  const [state, setState] = useState([]);
+  const userContext = useContext(UserContext);
+  const getUsers = async () => {
+    const response = await userAPI.getAllUsers();
+    setState(
+      response.filter(
+        (user) => user.username !== userContext.state.data.username
+      )
+    );
+  };
+  const history = useHistory();
+  const memeRef = useRef();
+  const projectNameRef = useRef();
+  const selectLanguageRef = useRef();
+
+  useEffect(() => {
+    getUsers();
+    window.scrollTo(0, 0);
+  }, []);
+
+  const [List, setList] = useState([userContext.state.data]);
+
+  const createProject = async () => {
+    const projectName = projectNameRef.current.value;
+    const selectLanguage = selectLanguageRef.current.value;
+    if (projectName && selectLanguage) {
+      const token = localStorage.getItem("accessToken");
+      const data = {
+        name: projectName,
+        language: selectLanguage,
+        members: List,
+      };
+      const response = await projectAPI.postProject(token, data);
+      if (!response.message) {
+        userContext.setProject(response);
+        history.push("/default/ide");
+      } else {
+        memeRef.current.innerText = "Network Error, Please try again later.";
+      }
+    } else {
+      memeRef.current.innerText = "Please enter project name, and language.";
+    }
+  };
 
   const handleRemoveMember = (item) => {
+    if (item.username === userContext.state.data.username) {
+      return;
+    }
     let copiedList = [...List];
-    copiedList = copiedList.filter((val) => val !== item);
+    copiedList = copiedList.filter((val) => val.username !== item.username);
+    console.log(item);
     setList(copiedList);
-    let copiedMembers = [...membersNames, item];
-    setMembersNames(copiedMembers);
+    let copiedMembers = [...state, item];
+    setState(copiedMembers);
   };
 
   function addMember() {
     var inputValue = document.getElementById("member").value;
+    let user = state.find((person) => person.username === inputValue);
     if (inputValue === "") {
       alert("You must select at least one member.");
     } else {
-      setList([...List, inputValue]);
-      let copiedMembers = [...membersNames];
-      copiedMembers = copiedMembers.filter((val) => val !== inputValue);
-      setMembersNames(copiedMembers);
+      setList([...List, user]);
+      let copiedMembers = [...state];
+      copiedMembers = copiedMembers.filter(
+        (val) => val.username !== inputValue
+      );
+      console.log(copiedMembers);
+      setState(copiedMembers);
     }
     document.getElementById("member").value = "";
   }
@@ -57,6 +97,7 @@ function CreateProject() {
           </label>
           <input
             type="text"
+            ref={projectNameRef}
             className="form-control"
             placeholder="Name your project"
             style={{ width: "30%", justifyContent: "center" }}
@@ -72,6 +113,7 @@ function CreateProject() {
             Select language
           </label>
           <select
+            ref={selectLanguageRef}
             className="form-control ml-3"
             id="languageSelected"
             style={{ width: "30%" }}
@@ -107,8 +149,8 @@ function CreateProject() {
             }}
           ></input>
           <datalist id="members">
-            {membersNames.map((name) => (
-              <option> {name} </option>
+            {state.map((user) => (
+              <option> {user.username} </option>
             ))}
           </datalist>
 
@@ -129,11 +171,11 @@ function CreateProject() {
                     className="d-flex row"
                     style={{ alignItems: "baseline" }}
                   >
-                    <h5>{val}</h5>
+                    <h5>{val.username}</h5>
                     <Button
                       className="bg-secondary ml-auto border-0"
                       size="sm"
-                      style={{ borderRadius: "50%" }}
+                      style={{ borderRadius: "3px" }}
                       onClick={() => handleRemoveMember(val)}
                     >
                       <i class="fas fa-times"></i>
@@ -143,12 +185,11 @@ function CreateProject() {
               );
             })}
           </ListGroup>
+          <p ref={memeRef} style={{ color: "red" }}></p>
 
-          <Link to="/default/ide">
-            <Button className="m-3" variant="primary">
-              Create Project
-            </Button>
-          </Link>
+          <Button className="m-3" variant="primary" onClick={createProject}>
+            Create Project
+          </Button>
 
           <Link to="/default/home">
             <Button className="m-3" variant="secondary">
@@ -159,6 +200,6 @@ function CreateProject() {
       </div>
     </div>
   );
-}
+};
 
 export default CreateProject;

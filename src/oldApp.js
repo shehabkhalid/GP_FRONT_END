@@ -1,20 +1,46 @@
-import React, { useState } from 'react';
-import Container from 'react-bootstrap/Container';
-import { Button, Card, Col, Dropdown, Form, Image, Jumbotron, ListGroup, Nav, Navbar, NavDropdown, OverlayTrigger, Row, Tab, Tooltip, Modal } from 'react-bootstrap';
-import './App.css';
+import React, { useState } from "react";
+import Container from "react-bootstrap/Container";
 import {
-  BrowserRouter as Router,
-  Switch,
-  Route,
-  Link
-} from "react-router-dom";
-import Styled from 'styled-components'
+  Button,
+  Card,
+  Col,
+  Dropdown,
+  Form,
+  Image,
+  Jumbotron,
+  ListGroup,
+  Nav,
+  Navbar,
+  NavDropdown,
+  OverlayTrigger,
+  Row,
+  Tab,
+  Tooltip,
+  Modal,
+} from "react-bootstrap";
+import "./App.css";
+import { BrowserRouter as Router, Switch, Route, Link } from "react-router-dom";
+import Styled from "styled-components";
 import { BsInbox, BsPlusSquare, BsArrowBarRight } from "react-icons/bs";
-import { MdHome, MdNotifications, MdPeople, MdHelp, MdFolder, MdCode } from "react-icons/md"
-import { SiJavascript, SiPython, SiCplusplus, SiPhp, SiNodeDotJs, SiJava } from "react-icons/si"
+import {
+  MdHome,
+  MdNotifications,
+  MdPeople,
+  MdHelp,
+  MdFolder,
+  MdCode,
+} from "react-icons/md";
+import {
+  SiJavascript,
+  SiPython,
+  SiCplusplus,
+  SiPhp,
+  SiNodeDotJs,
+  SiJava,
+} from "react-icons/si";
 import Sidebar from "react-sidebar";
-import CommunicationPage from "./Communication/Communication" 
-import TrelloPage from './components/TrelloPage'
+import CommunicationPage from "./Communication/Communication";
+import TrelloPage from "./components/TrelloPage";
 import Ide from "./Project_Page/projectPage";
 
 const SignIn = () => {
@@ -22,15 +48,23 @@ const SignIn = () => {
     <Form className="p-5">
       <Form.Group controlId="formBasicEmail">
         <Form.Label>Email address</Form.Label>
-        <Form.Control className="shadow-sm rounded-0" type="email" placeholder="Enter email" />
+        <Form.Control
+          className="shadow-sm rounded-0"
+          type="email"
+          placeholder="Enter email"
+        />
         <Form.Text className="text-muted">
           We'll never share your email with anyone else.
-            </Form.Text>
+        </Form.Text>
       </Form.Group>
 
       <Form.Group controlId="formBasicPassword">
         <Form.Label>Password</Form.Label>
-        <Form.Control className="shadow-sm rounded-0" type="password" placeholder="Password" />
+        <Form.Control
+          className="shadow-sm rounded-0"
+          type="password"
+          placeholder="Password"
+        />
       </Form.Group>
 
       <Link to="/default/home">
@@ -40,27 +74,39 @@ const SignIn = () => {
       </Link>
     </Form>
   );
-}
+};
 
 const SignUp = () => {
   return (
     <Form className="p-5">
       <Form.Group controlId="formBasicEmail">
         <Form.Label>Name</Form.Label>
-        <Form.Control className="shadow-sm rounded-0" type="email" placeholder="Enter name" />
+        <Form.Control
+          className="shadow-sm rounded-0"
+          type="email"
+          placeholder="Enter name"
+        />
       </Form.Group>
 
       <Form.Group controlId="formBasicEmail">
         <Form.Label>Email address</Form.Label>
-        <Form.Control className="shadow-sm rounded-0" type="email" placeholder="Enter email" />
+        <Form.Control
+          className="shadow-sm rounded-0"
+          type="email"
+          placeholder="Enter email"
+        />
         <Form.Text className="text-muted">
           We'll never share your email with anyone else.
-            </Form.Text>
+        </Form.Text>
       </Form.Group>
 
       <Form.Group controlId="formBasicPassword">
         <Form.Label>Password</Form.Label>
-        <Form.Control className="shadow-sm rounded-0" type="password" placeholder="Password" />
+        <Form.Control
+          className="shadow-sm rounded-0"
+          type="password"
+          placeholder="Password"
+        />
       </Form.Group>
 
       <Link to="/default/home">
@@ -70,26 +116,49 @@ const SignUp = () => {
       </Link>
     </Form>
   );
-}
+};
 
 const Main = () => {
   return (
     <div>
-      <Navbar className="bg-light shadow-sm justify-content-center" variant="light">
+      <Navbar
+        className="bg-light shadow-sm justify-content-center"
+        variant="light"
+      >
         <Navbar.Brand href="#">Col-Lab</Navbar.Brand>
       </Navbar>
       <Container className="pt-3 mt-5 ">
         <Tab.Container defaultActiveKey="signup">
           <Row>
             <Col sm={2} lg={3}></Col>
-            <Col sm={8} lg={6} className="rounded-3 shadow-sm bg-light" bg="dark">
+            <Col
+              sm={8}
+              lg={6}
+              className="rounded-3 shadow-sm bg-light"
+              bg="dark"
+            >
               <Container>
-                <Nav fill variant="pills" className="p-5" defaultActiveKey="/signup">
-                  <Nav.Item >
-                    <Nav.Link className="shadow-sm rounded-0 mr-1" eventKey="signup">SignUp</Nav.Link>
+                <Nav
+                  fill
+                  variant="pills"
+                  className="p-5"
+                  defaultActiveKey="/signup"
+                >
+                  <Nav.Item>
+                    <Nav.Link
+                      className="shadow-sm rounded-0 mr-1"
+                      eventKey="signup"
+                    >
+                      SignUp
+                    </Nav.Link>
                   </Nav.Item>
                   <Nav.Item>
-                    <Nav.Link className="shadow-sm rounded-0 ml-1" eventKey="signin">SignIn</Nav.Link>
+                    <Nav.Link
+                      className="shadow-sm rounded-0 ml-1"
+                      eventKey="signin"
+                    >
+                      SignIn
+                    </Nav.Link>
                   </Nav.Item>
                 </Nav>
               </Container>
@@ -110,7 +179,7 @@ const Main = () => {
       </Container>
     </div>
   );
-}
+};
 
 const renderTooltip = (props) => (
   <Tooltip id="button-tooltip" {...props}>
@@ -124,20 +193,20 @@ function Profile() {
 
   return (
     <div>
-
       <Jumbotron fluid className="shadow-sm text-center">
-
         <Container fluid className="justify-content-center">
-          <Image className="my-2" src="https://avatars.githubusercontent.com/u/43586099?v=4" style={{ width: 150, height: 150 }} roundedCircle />
+          <Image
+            className="my-2"
+            src="https://avatars.githubusercontent.com/u/43586099?v=4"
+            style={{ width: 150, height: 150 }}
+            roundedCircle
+          />
           <h1>{name}</h1>
-          <p>
-            {"@" + userName}
-          </p>
+          <p>{"@" + userName}</p>
           <Link to="/account">
             <a href="#action">Edit Your Profile</a>
           </Link>
         </Container>
-
       </Jumbotron>
       <Container className="text-center">
         <h1 className="my-2">Projects</h1>
@@ -149,9 +218,15 @@ function Profile() {
               <Button variant="light">
                 <Card.Body>
                   <Row>
-                    <Col lg={4} className="text">Name</Col>
-                    <Col lg={4} className="text">Python</Col>
-                    <Col lg={4} className="text">6 months ago</Col>
+                    <Col lg={4} className="text">
+                      Name
+                    </Col>
+                    <Col lg={4} className="text">
+                      Python
+                    </Col>
+                    <Col lg={4} className="text">
+                      6 months ago
+                    </Col>
                   </Row>
                 </Card.Body>
               </Button>
@@ -162,9 +237,15 @@ function Profile() {
               <Button variant="light">
                 <Card.Body>
                   <Row>
-                    <Col lg={4} className="text">Name</Col>
-                    <Col lg={4} className="text">Python</Col>
-                    <Col lg={4} className="text">6 months ago</Col>
+                    <Col lg={4} className="text">
+                      Name
+                    </Col>
+                    <Col lg={4} className="text">
+                      Python
+                    </Col>
+                    <Col lg={4} className="text">
+                      6 months ago
+                    </Col>
                   </Row>
                 </Card.Body>
               </Button>
@@ -175,16 +256,21 @@ function Profile() {
               <Button variant="light">
                 <Card.Body>
                   <Row>
-                    <Col lg={4} className="text">Name</Col>
-                    <Col lg={4} className="text">Python</Col>
-                    <Col lg={4} className="text">6 months ago</Col>
+                    <Col lg={4} className="text">
+                      Name
+                    </Col>
+                    <Col lg={4} className="text">
+                      Python
+                    </Col>
+                    <Col lg={4} className="text">
+                      6 months ago
+                    </Col>
                   </Row>
                 </Card.Body>
               </Button>
             </Card>
           </ListGroup.Item>
         </ListGroup>
-
       </Container>
     </div>
   );
@@ -276,7 +362,6 @@ function SideBarConent() {
 }
 */
 function Home() {
-
   return (
     <div style={{ zIndex: 1 }}>
       <Container className="text-left mt-5 pt-5">
@@ -305,24 +390,28 @@ function Home() {
               bg="light"
               text="dark"
               className="rounded-0 shadow-sm"
-              style={{ width: '15rem' }}>
+              style={{ width: "15rem" }}
+            >
               <Card.Body>
-                <Card.Title className="text-center">Instagram Clone App</Card.Title>
-                <Card.Subtitle className="mb-2 text-center"><SiJavascript className="mb-1 mr-1" /><SiNodeDotJs className="mb-1 mr-1" /></Card.Subtitle>
+                <Card.Title className="text-center">
+                  Instagram Clone App
+                </Card.Title>
+                <Card.Subtitle className="mb-2 text-center">
+                  <SiJavascript className="mb-1 mr-1" />
+                  <SiNodeDotJs className="mb-1 mr-1" />
+                </Card.Subtitle>
                 <Link to="/default/ide">
-                  <Card.Link >Go To Project</Card.Link>
+                  <Card.Link>Go To Project</Card.Link>
                 </Link>
                 <Link to="/default/tasks" className="ml-3">
-                  <Card.Link >Go To Tasks</Card.Link>
+                  <Card.Link>Go To Tasks</Card.Link>
                 </Link>
               </Card.Body>
             </Card>
           </Col>
         </Row>
-
       </Container>
     </div>
-
   );
 }
 
@@ -351,47 +440,26 @@ function Tasks() {
 }
 
 function Languages() {
-  return (
-    <div>
-
-    </div>
-  );
+  return <div></div>;
 }
 
 function Notifcations() {
-  return (
-    <div>
-
-    </div>
-  );
+  return <div></div>;
 }
 
 function Help() {
-  return (
-    <div>
-
-    </div>
-  );
+  return <div></div>;
 }
 
 function Projects() {
-
-  return (
-    <div>
-    </div>
-  );
+  return <div></div>;
 }
 
 function Teams() {
-  return (
-    <div>
-
-    </div>
-  );
+  return <div></div>;
 }
 
 function CodeReview() {
-
   const CardHeaderContainer = Styled.div`
     display: flex;
     flex-direction: row;
@@ -400,11 +468,11 @@ function CodeReview() {
 
   const [reviewcomments, setReviewComments] = useState([]);
 
-  const handleRemoveItem = item => {
+  const handleRemoveItem = (item) => {
     let copiedReview = [...reviewcomments];
     copiedReview = copiedReview.filter((val) => val !== item);
     setReviewComments(copiedReview);
-  }
+  };
 
   function addReview() {
     //var li = document.createElement("li");
@@ -436,46 +504,67 @@ function CodeReview() {
 
   return (
     <div>
-      <div className="container mt-3" align="center" style={{ borderRadius: "5px" }}>
-        <div className="mb-3" style={{ fontSize: "30px", fontWeight: "600" }}>Project Review</div>
+      <div
+        className="container mt-3"
+        align="center"
+        style={{ borderRadius: "5px" }}
+      >
+        <div className="mb-3" style={{ fontSize: "30px", fontWeight: "600" }}>
+          Project Review
+        </div>
         <div class="form-outline w-50 mb-4">
-          <textarea id="review" class="form-control" placeholder="Add your comments" rows="5"></textarea>
+          <textarea
+            id="review"
+            class="form-control"
+            placeholder="Add your comments"
+            rows="5"
+          ></textarea>
         </div>
         <Button className="m-3" variant="secondary" onClick={addReview}>
           Add Review
-    </Button>
+        </Button>
 
-        {
-          reviewcomments.map(val => <Card className="comment-card" style={{width: "50rem"}}>
+        {reviewcomments.map((val) => (
+          <Card className="comment-card" style={{ width: "50rem" }}>
             <Card.Body className="comment-card-body">
               <Card.Title>
                 <CardHeaderContainer>
-                  <img style={{borderRadius: "50px"}} alt="profile pic" width="50px" height="50px" src="https://lh3.googleusercontent.com/a-/AOh14GiQu5YIfLWdOBR42GmmOcNLk3jB3pV1rtt7foy77A=s288-p-rw-no" />
+                  <img
+                    style={{ borderRadius: "50px" }}
+                    alt="profile pic"
+                    width="50px"
+                    height="50px"
+                    src="https://lh3.googleusercontent.com/a-/AOh14GiQu5YIfLWdOBR42GmmOcNLk3jB3pV1rtt7foy77A=s288-p-rw-no"
+                  />
                   <strong className="comment-user-name">Ali Adel</strong>
-                  <Button type="button" className="btn btn-secondary btn-sm w-15 ml-auto" onClick={() => handleRemoveItem(val)}><i class="fas fa-times fa-lg"></i></Button>
+                  <Button
+                    type="button"
+                    className="btn btn-secondary btn-sm w-15 ml-auto"
+                    onClick={() => handleRemoveItem(val)}
+                  >
+                    <i class="fas fa-times fa-lg"></i>
+                  </Button>
                 </CardHeaderContainer>
               </Card.Title>
               <Card.Text>
                 <p className="comment-text ">{val}</p>
               </Card.Text>
             </Card.Body>
-          </Card>)
-        }
-
+          </Card>
+        ))}
       </div>
     </div>
   );
 }
 
 function CreateProject() {
-
   const [List, setList] = useState([]);
 
-  const handleRemoveItem = item => {
+  const handleRemoveItem = (item) => {
     let copiedList = [...List];
     copiedList = copiedList.filter((val) => val !== item);
     setList(copiedList);
-  }
+  };
 
   function addMember() {
     // var li = document.createElement("list-item");
@@ -506,16 +595,37 @@ function CreateProject() {
 
   return (
     <div>
-      <div className="container mt-3 bg-light" align="center" style={{ borderRadius: "5px" }}>
-        <div className="mb-3" style={{ fontSize: "30px", fontWeight: "600" }}>Create New Project</div>
-        <div className="form-group ml-3" >
-          <label style={{ fontWeight: '600' }}>Project name</label>
-          <input type="text" className="form-control" placeholder="Name your project" style={{ width: "30%", justifyContent: "center" }}></input>
+      <div
+        className="container mt-3 bg-light"
+        align="center"
+        style={{ borderRadius: "5px" }}
+      >
+        <div className="mb-3" style={{ fontSize: "30px", fontWeight: "600" }}>
+          Create New Project
+        </div>
+        <div className="form-group ml-3">
+          <label style={{ fontWeight: "600" }}>Project name</label>
+          <input
+            type="text"
+            className="form-control"
+            placeholder="Name your project"
+            style={{ width: "30%", justifyContent: "center" }}
+          ></input>
         </div>
 
         <div className="form-group">
-          <label className="ml-3" for="languageSelected" style={{ fontWeight: '600' }}>Select language</label>
-          <select className="form-control ml-3" id="languageSelected" style={{ width: "30%" }}>
+          <label
+            className="ml-3"
+            for="languageSelected"
+            style={{ fontWeight: "600" }}
+          >
+            Select language
+          </label>
+          <select
+            className="form-control ml-3"
+            id="languageSelected"
+            style={{ width: "30%" }}
+          >
             <option>Languages</option>
             <option>C++</option>
             <option>JavaScript</option>
@@ -524,9 +634,23 @@ function CreateProject() {
         </div>
 
         <div>
-          <label className="ml-3" for="member" style={{ fontWeight: '600' }}>Add member/s</label>
+          <label className="ml-3" for="member" style={{ fontWeight: "600" }}>
+            Add member/s
+          </label>
           <br></br>
-          <input className="ml-3" list="members" name="member" id="member" style={{ height: "38px", width: "30%", borderRadius: "5px", border: "1px solid #ced4da", paddingLeft: "15px" }}></input>
+          <input
+            className="ml-3"
+            list="members"
+            name="member"
+            id="member"
+            style={{
+              height: "38px",
+              width: "30%",
+              borderRadius: "5px",
+              border: "1px solid #ced4da",
+              paddingLeft: "15px",
+            }}
+          ></input>
           <datalist id="members">
             <option>Ahmed Hatem</option>
             <option>Mohamed Hatem</option>
@@ -546,33 +670,41 @@ function CreateProject() {
 
           <Button className="m-3" variant="secondary" onClick={addMember}>
             Add Member
-    </Button>
+          </Button>
 
           <ListGroup id="myList">
-            {
-              List.map((val) => {
-                return <ListGroup.Item>
-                  <div className="d-flex row" style={{ alignItems: "baseline" }}>
+            {List.map((val) => {
+              return (
+                <ListGroup.Item>
+                  <div
+                    className="d-flex row"
+                    style={{ alignItems: "baseline" }}
+                  >
                     <h5>{val}</h5>
-                    <Button className="bg-secondary ml-auto border-0" size="sm" onClick={() => handleRemoveItem(val)}><i class='fas fa-times'></i></Button>
+                    <Button
+                      className="bg-secondary ml-auto border-0"
+                      size="sm"
+                      onClick={() => handleRemoveItem(val)}
+                    >
+                      <i class="fas fa-times"></i>
+                    </Button>
                   </div>
                 </ListGroup.Item>
-              })
-            }
+              );
+            })}
           </ListGroup>
 
           <Link to="/default/ide">
             <Button className="m-3" variant="primary">
               Create Project
-    </Button>
+            </Button>
           </Link>
 
           <Link to="/default/home">
             <Button className="m-3" variant="secondary">
               Cancel
-    </Button>
+            </Button>
           </Link>
-
         </div>
       </div>
     </div>
@@ -583,13 +715,13 @@ class Default extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      sidebarOpen: false
+      sidebarOpen: false,
     };
     this.onSetSidebarOpen = this.onSetSidebarOpen.bind(this);
   }
 
   onSetSidebarOpen(open) {
-    console.log("hello")
+    console.log("hello");
     this.setState({ sidebarOpen: open });
   }
   render() {
@@ -711,13 +843,13 @@ class DefaultNavBar extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      username: 'AhmedSalam99'
+      username: "AhmedSalam99",
     };
   }
 
   render() {
     return (
-      <Navbar bg="secondary" variant="dark" style={{ zIndex: '2' }} >
+      <Navbar bg="secondary" variant="dark" style={{ zIndex: "2" }}>
         {/*
         <Button variant="outline-primary" onClick={this.props.passedFunction} >
           <BsArrowBarRight className="mb-1" />
@@ -725,14 +857,23 @@ class DefaultNavBar extends React.Component {
         */}
 
         <Link to="/default/home">
-          <Navbar.Brand href="#home" style={{ fontSize: '25px', fontWeight: 'bold' }}>COL-LAB</Navbar.Brand>
+          <Navbar.Brand
+            href="#home"
+            style={{ fontSize: "25px", fontWeight: "bold" }}
+          >
+            COL-LAB
+          </Navbar.Brand>
         </Link>
 
         <Navbar.Toggle aria-controls="basic-navbar-nav" />
         <Navbar.Collapse>
           <Nav className="ml-auto">
-            <Image src="https://avatars.githubusercontent.com/u/43586099?v=4" style={{ width: 30, height: 30, marginTop: '5px' }} roundedCircle />
-            <NavDropdown title={"@" + this.state.username} >
+            <Image
+              src="https://avatars.githubusercontent.com/u/43586099?v=4"
+              style={{ width: 30, height: 30, marginTop: "5px" }}
+              roundedCircle
+            />
+            <NavDropdown title={"@" + this.state.username}>
               <Link to="/default/profile">
                 <NavDropdown.Item href="#action/3.1">Profile</NavDropdown.Item>
               </Link>
@@ -809,13 +950,11 @@ class DefaultNavBar extends React.Component {
 }
 
 class App extends React.Component {
-
   render() {
     return (
       <Router>
         <Route exact path="/" component={Main} />
         <Route path="/default" component={Default} />
-
       </Router>
     );
   }

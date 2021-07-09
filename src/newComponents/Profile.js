@@ -12,7 +12,7 @@ import {
 import "../App.css";
 import { Link } from "react-router-dom";
 
-function Profile() {
+const Profile = () => {
   const [name] = useState("Ahmed Salama");
   const [userName] = useState("AhmedSalama135");
 
@@ -28,7 +28,7 @@ function Profile() {
           />
           <h1>{name}</h1>
           <p>{"@" + userName}</p>
-          <Link to="/account">
+          <Link to="/default/account">
             <a href="#action">Edit Your Profile</a>
           </Link>
         </Container>
@@ -99,5 +99,5 @@ function Profile() {
       </Container>
     </div>
   );
-}
+};
 export default Profile;

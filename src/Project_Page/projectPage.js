@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useContext, useEffect } from "react";
 import { useMonaco } from "@monaco-editor/react";
 import Terminal from "../components/Terminal";
 import { Drawer } from "@material-ui/core";
@@ -10,8 +10,16 @@ import { makeStyles, useTheme } from "@material-ui/core/styles";
 import { Collapse } from "reactstrap";
 import SideBar from "../newComponents/SideBar";
 import "./projectPage.css";
-
+import UserContext from "../Contexts/UserContext/UserContext";
+import projectAPI from "../API/project";
+import fileAPI from "../API/file";
 import { listen } from "vscode-ws-jsonrpc";
+import ReactTooltip from "react-tooltip";
+
+/////////////////////////////////fetched but not yet added to the ide
+/////////////////////////////////fetched but not yet added to the ide
+/////////////////////////////////fetched but not yet added to the ide
+/////////////////////////////////fetched but not yet added to the ide
 
 import {
   MonacoLanguageClient,
@@ -26,10 +34,8 @@ import ReconnectingWebSocket from "reconnecting-websocket";
 import socketio from "socket.io-client";
 var socketRef = socketio.connect("https://communication.colab.cf/");
 var role = 0;
-// prompt("Please enter your role", "");
 
 const MonacoCollabExt = require("@convergencelabs/monaco-collab-ext");
-
 const drawerWidth = 180;
 
 const useStyles = makeStyles((theme) => ({
@@ -51,7 +57,38 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-function Ide(props) {
+const Ide = (props) => {
+  const [state, setState] = useState([]);
+  const userContext = useContext(UserContext);
+  const getFiles = async () => {
+    const token = localStorage.getItem("accessToken");
+    const projectID = userContext.state.project._id;
+    const response = await projectAPI.getAllFilesNames(token, projectID);
+    if (!response.message) {
+      setState(response);
+    } else {
+      alert("Network Error, Please try again later.");
+    }
+  };
+
+  const getFileData = async (filename) => {
+    const token = localStorage.getItem("accessToken");
+    const data = {
+      fileName: filename.split(".")[0],
+      projectId: userContext.state.project._id,
+    };
+    const response = await fileAPI.getFileDataByName(token, data);
+    if (!response.message) {
+      console.log(response);
+      /////////////////////////////////fetched but not yet added to the ide/////////////here
+    }
+  };
+
+  useEffect(() => {
+    getFiles();
+    window.scrollTo(0, 0);
+  }, []);
+
   var stream = useState();
   var video = document.getElementById("CamDiv");
   if (video != null) {
@@ -183,6 +220,18 @@ function Ide(props) {
         }
       });
 
+      const createWebSocket = (url) => {
+        const socketOptions = {
+          maxReconnectionDelay: 10000,
+          minReconnectionDelay: 1000,
+          reconnectionDelayGrowFactor: 1.3,
+          connectionTimeout: 10000,
+          maxRetries: Infinity,
+          debug: false,
+        };
+        return new ReconnectingWebSocket(url, [], socketOptions);
+      };
+
       const url = "ws://localhost:3002/python";
       const webSocket = createWebSocket(url);
 
@@ -196,7 +245,7 @@ function Ide(props) {
         },
       });
 
-      function createLanguageClient(connection) {
+      const createLanguageClient = (connection) => {
         return new MonacoLanguageClient({
           name: "Sample Language Client",
           clientOptions: {
@@ -217,19 +266,7 @@ function Ide(props) {
             },
           },
         });
-      }
-
-      function createWebSocket(url) {
-        const socketOptions = {
-          maxReconnectionDelay: 10000,
-          minReconnectionDelay: 1000,
-          reconnectionDelayGrowFactor: 1.3,
-          connectionTimeout: 10000,
-          maxRetries: Infinity,
-          debug: false,
-        };
-        return new ReconnectingWebSocket(url, [], socketOptions);
-      }
+      };
 
       console.log("here is the monaco isntance:", monaco.languages);
     }
@@ -337,8 +374,11 @@ function Ide(props) {
 
   return (
     <div className="flex-row">
-      <SideBar handleDrawer={handleDrawer} showRun={true} />
-      
+      <SideBar
+        handleDrawer={handleDrawer}
+        showRun={true} /*saveLogic={} runLogic={} */
+      />
+
       <Drawer
         className={classes.drawer}
         variant="persistent"
@@ -350,31 +390,43 @@ function Ide(props) {
         backgroundColor="rgb(108, 117, 125);"
         style={{ zIndex: "1" }}
       >
-        <div className="sidebar">
+        <div className="sidebar d-flex col">
           <TreeView
             className={classes.root}
             defaultCollapseIcon={<ExpandMoreIcon />}
             defaultExpandIcon={<ChevronRightIcon />}
           >
-            <TreeItem nodeId="1" label="public">
-              <TreeItem
-                nodeId="2"
-                label="index.html"
-                style={{ color: "#000" }}
-              />
-              <TreeItem nodeId="3" label="manifest.json" />
-              <TreeItem nodeId="4" label="logo.png" />
-            </TreeItem>
-            <TreeItem nodeId="5" label="src">
-              <TreeItem nodeId="10" label="index.js" />
-              <TreeItem nodeId="6" label="component">
-                <TreeItem nodeId="7" label="tree">
-                  <TreeItem nodeId="8" label="tree-view.js" />
-                  <TreeItem nodeId="9" label="tree-item.js" />
-                </TreeItem>
-              </TreeItem>
+            <TreeItem nodeId="1" label={userContext.state.project.name}>
+              {state.map((file, index) => {
+                return (
+                  <TreeItem
+                    nodeId={index + 2}
+                    label={file}
+                    onClick={() => getFileData(file)}
+                  />
+                );
+              })}
             </TreeItem>
           </TreeView>
+          {/* <button
+            data-tip
+            data-for="addFile"
+            type="button"
+            className="btn btn-secondary mb-1 m-1"
+            style={{ maxHeight: "40px", width: "40px", borderRadius: "5px" }}
+          >
+            <i class="fas fa-plus"></i>
+          </button>
+          <ReactTooltip
+            id="addFile"
+            place="right"
+            effect="solid"
+            backgroundColor="white"
+            textColor="black"
+          >
+            Add File
+          </ReactTooltip> */}
+          {/* for later  */}
         </div>
       </Drawer>
 
@@ -420,6 +472,6 @@ function Ide(props) {
       </div>
     </div>
   );
-}
+};
 
 export default Ide;

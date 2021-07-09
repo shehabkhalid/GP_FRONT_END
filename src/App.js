@@ -1,12 +1,15 @@
-import React, { Component } from "react";
+import React from "react";
 import { BrowserRouter, Route, Switch } from "react-router-dom";
 import Main from "./newComponents/Main";
 import Default from "./newComponents/Default";
 
 import "./App.css";
-class App extends Component {
-  render() {
-    return (
+import UserContextState from "./Contexts/UserContext/UserContextState";
+
+const App = () => {
+  return (
+    <UserContextState>
+
       <BrowserRouter>
         <Switch>
           <Route exact path="/" component={Main} />
@@ -15,8 +18,8 @@ class App extends Component {
      
         </Switch>
       </BrowserRouter>
-    );
-  }
-}
+    </UserContextState>
+  );
+};
 
 export default App;

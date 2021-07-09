@@ -1,13 +1,27 @@
-import React, { useContext } from "react";
+import React, { useContext, useEffect, useRef } from "react";
 import Column from "./Column";
 import { DragDropContext } from "react-beautiful-dnd";
 import { CardDeck } from "react-bootstrap";
-import TasksContext from "../TasksContext/TasksContext";
-import Aux from "../hoc/Auxiliary";
+import TasksContext from "../Contexts/TasksContext/TasksContext";
 import SideBar from "../newComponents/SideBar";
+import taskAPI from "../API/task";
+import UserContext from "../Contexts/UserContext/UserContext";
 
 const TrelloPage = () => {
   const tasksContext = useContext(TasksContext);
+  const userContext = useContext(UserContext);
+
+  const fetchTasks = async () => {
+    const token = localStorage.getItem("accessToken");
+    const projectID = userContext.state.project._id;
+    const response = await taskAPI.getTasks(token, projectID);
+    if (!response.message) {
+      console.log(response);
+      //tasksContext.saveTasks(response);
+    }
+  };
+
+  useEffect(() => fetchTasks(), []);
 
   const onDragEnd = (result) => {
     const { destination, source, draggableId } = result;
@@ -87,7 +101,6 @@ const TrelloPage = () => {
     );
   });
   return (
-    // <div style={{display:"flex"}}>
     <DragDropContext onDragEnd={onDragEnd}>
       <CardDeck style={{ margin: "0px" }}>
         <SideBar />
@@ -104,7 +117,6 @@ const TrelloPage = () => {
         })}
       </CardDeck>
     </DragDropContext>
-    // </div>
   );
 };
 
