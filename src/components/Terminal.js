@@ -18,7 +18,7 @@ const Terminal = ({ code, runner, reset }) =>
 
         try
         {
-            socket = io("http://localhost:3002",{
+            socket = io("https://terminal.colab.cf",{
                 jsonp: true,
                 transports: ['websocket']
             })
