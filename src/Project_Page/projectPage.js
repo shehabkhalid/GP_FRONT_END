@@ -1,6 +1,6 @@
 import React, { useState, useContext, useEffect } from "react";
 import { useMonaco } from "@monaco-editor/react";
-import Terminal from "react-console-emulator";
+import Terminal from "../components/Terminal";
 import { Drawer } from "@material-ui/core";
 import TreeView from "@material-ui/lab/TreeView";
 import ExpandMoreIcon from "@material-ui/icons/ExpandMore";
@@ -457,14 +457,15 @@ const Ide = (props) => {
         <Collapse isOpen={isOpen}>
           <div id="terminal-mr">
             <Terminal
-              errorText={errorText}
-              ignoreCommandCase
-              noEchoBack
-              promptLabel={">"}
-              className="main-terminal"
-              contentClassName="main-terminal-content"
-              promptLabelClassName="text-white"
-              inputClassName="text-white"
+              // errorText={errorText}
+              // ignoreCommandCase
+              // noEchoBack
+              // promptLabel={">"}
+              // className="main-terminal"
+              // contentClassName="main-terminal-content"
+              // promptLabelClassName="text-white"
+              // inputClassName="text-white"
+              runner={true}
             />
           </div>
         </Collapse>
