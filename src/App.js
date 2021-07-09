@@ -9,11 +9,13 @@ class App extends Component {
     return (
       <BrowserRouter>
         <Switch>
-          <Route exact path="/" component={Main} />
-          <Route path="/default" component={Default} />
-          <Route path="/araf">
-            <Terminal runner={true} />
+          <Route exact path="/" component={Terminal} >
+
           </Route>
+          <Route path="/default" component={Default} />
+          {/* <Route path="/araf">
+            <Terminal runner={true} />
+          </Route> */}
         </Switch>
       </BrowserRouter>
     );
