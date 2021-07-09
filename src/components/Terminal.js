@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState, forwardRef } from 'react'
 import { XTerm } from 'xterm-for-react'
-import { io } from 'socket.io-client'
+import socketio from 'socket.io-client'
 
 
 
@@ -15,13 +15,10 @@ const Terminal = ({ code, runner, reset }) =>
     const makeConnection = () =>
     {
       
-
+       
         try
         {
-            socket = io("https://terminal.colab.cf",{
-                jsonp: true,
-                transports: ['websocket']
-            })
+            socket = socketio.connect("https://terminal.colab.cf")
 
             socket.on("connect", () =>
             {
