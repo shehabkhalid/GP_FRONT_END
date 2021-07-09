@@ -161,6 +161,7 @@ const Ide = (props) => {
         editor: source,
         onInsert(index, text) {
           socketRef.emit("Insert", { index, text, role });
+          console.log(role)
         },
         onReplace(index, length, text) {
           socketRef.emit("Replace", { index, length, text, role });
@@ -188,6 +189,8 @@ const Ide = (props) => {
       var getrole = role;
 
       socketRef.on("Insert", ({ index, text, role }) => {
+       console.log(getrole,role)
+
         if (getrole != role) {
           source.updateOptions({ readOnly: false });
           sourceContentManager.insert(index, text);
